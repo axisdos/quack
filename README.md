@@ -52,4 +52,4 @@ class Comments extends Module {
 	}
 }
 ```
-The default profile template is located at /lib/templates/profile.tpl. But because the module has added post count, a new template is needed.
+If more than one module uses the same template, 
