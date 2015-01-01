@@ -65,3 +65,4 @@ class Comments extends Module {
 	}
 }
 ```
+Quack will not run any module with pirority until those without have been ran.
