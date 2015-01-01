@@ -6,4 +6,4 @@ Quack is a forum software written in PHP, MySQL, CSS, HTML and JavaScript. It us
 features
 =====
 
-*Unlimited domains
+* WYSIWYG Posting
