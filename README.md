@@ -28,4 +28,27 @@ class Comments extends Module {
 	}
 }
 ```
-The onViewProfile function would be called when Quack finished loading the profile.
+The onViewProfile function will be called when Quack has finished loading the profile. Another module example.
+
+```php
+# simple module to add post count to profiles
+
+class Comments extends Module {
+
+	public function __construct(){
+	}
+	
+	public function onViewProfile(Template $profile, User $user){
+		$profile->location = 'modules/comments/profile.tpl';
+		
+		if(isset($_POST['like_user'])){
+			$this->like($user);
+			$profile->assign('success', 'You have liked this user');
+		}
+	}
+	
+	public function like(User $user){
+		# code to handle the like in the db
+	}
+}
+```
