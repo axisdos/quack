@@ -14,7 +14,17 @@ module example
 The module system hasn't been written in yet, but this is what a module's code may look like
 
 ```php
-require 'redcarpet'
-markdown = Redcarpet.new("Hello World!")
-puts markdown.to_html
+# simple module to add post count to profiles
+
+class Comments extends Module {
+
+	public function __construct(){
+	}
+	
+	public function onViewProfile(Template $profile, User $user){
+		$profile->location = 'modules/comments/profile.tpl';
+		
+		$profile->assign('comments_count', $user->getPostCount());
+	}
+}
 ```
