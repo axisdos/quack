@@ -7,3 +7,14 @@ features
 =====
 
 * WYSIWYG Posting
+* Module System
+
+module example
+=====
+The module system hasn't been written in yet, but this is what a module's code may look like
+
+```php
+require 'redcarpet'
+markdown = Redcarpet.new("Hello World!")
+puts markdown.to_html
+```
