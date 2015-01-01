@@ -56,7 +56,7 @@ If more than one module changes the same template variable, the template will us
 
 module priority
 =====
-If a module is important and needs to be ran last to make sure its template assignments are ensured, the module's pirority can be changed:
+If a module is important and its template assignments need to be definite, the module's pirority can be changed to 1. 
 
 ```php
 class Comments extends Module {
