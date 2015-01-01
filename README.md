@@ -28,3 +28,4 @@ class Comments extends Module {
 	}
 }
 ```
+The onViewProfile function would be called when Quack finished loading the profile.
