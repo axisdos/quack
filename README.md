@@ -58,9 +58,8 @@ module priority
 =====
 If a module is important and needs to be ran last to make sure its template assignments are ensured, the module's pirority can be changed:
 
-```python
+```php
 class Comments extends Module {
-
 	public function __construct(){
 		$this->pirority = 1;
 	}
