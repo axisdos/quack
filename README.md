@@ -53,3 +53,16 @@ class Comments extends Module {
 }
 ```
 If more than one module changes the same template variable, the template will use the last variable change.
+
+module priority
+=====
+If a module is important and needs to be ran last to make sure its template assignments are ensured, the module's pirority can be changed:
+
+```python
+class Comments extends Module {
+
+	public function __construct(){
+		$this->pirority = 1;
+	}
+}
+```
