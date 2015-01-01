@@ -52,4 +52,4 @@ class Comments extends Module {
 	}
 }
 ```
-If more than one module uses the same template, 
+If more than one module changes the same template variable, the module that was ran last will be
