@@ -78,6 +78,11 @@ if(isset($_GET['post'])){
 
 die();
 
+/**
+ * This is the original TinyBB viewthread.php which has not yet been removed
+ */
+ 
+
 		 $purifier = new HTMLPurifier();
       if (!$_GET['post']){ } else {
         $clean_get = clean($_GET[post]);
