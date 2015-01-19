@@ -1,4 +1,84 @@
 <?php
+
+// include smarty templating
+
+require_once "lib/3rdparty/smarty/Smarty.class.php";
+
+$view = new Smarty;
+
+// if user is logged in, let the template know
+
+if(isset($user['username'])){
+    $view->assign('user', $user);
+}
+
+// create instance of HTMLPurifier
+
+$purifier = new HTMLPurifier();
+
+function purify($message){
+    global $purifier;
+    return $purifier->purify($message);
+}
+// check to see if the web browser is requesting a thread
+
+if(isset($_GET['post'])){
+    // will implement PDO or something similar later on
+    $identifier = mysql_real_escape_string($_GET['post']);
+    $findthread = mysql_query("SELECT * FROM tinybb_threads INNER JOIN members ON tinybb_threads.thread_author = members.username WHERE tinybb_threads.thread_key = '{$identifier}'");
+    
+    if(mysql_num_rows($findthread) == 0){
+        $view->assign('url', 'showthread');
+        $view->display('lib/tpl/404.tpl');
+    } else {
+        $firstpost = mysql_fetch_assoc($findthread);
+        
+        // allow users to post
+        
+        if(isset($user) && isset($_POST['addpost'])){
+            $message = mysql_real_escape_string($_POST['message']);
+            
+            if(strlen($message) < 5 || strlen($message) > 10000){
+                $view->assign('error', 'Your message length didn\'t meet our guidelines');
+            } else {
+                $username = $user['username'];
+                $replykey = uniqid();
+                $date = date("d-m-Y H:i:s");
+                mysql_query("INSERT INTO tinybb_replies (reply_content, reply_author, reply_key, thread_key, date) VALUES('$message', '$username', '$replykey', '$identifier', '$date')");
+                
+                $view->assign('success', 'Your post was successfully added');
+            }
+        }
+        // let's generate the first post
+        
+        $view->assign('firstpost', $firstpost);
+        
+        $findposts = mysql_query("SELECT *, tinybb_replies.date as postdate FROM tinybb_replies INNER JOIN members ON tinybb_replies.reply_author = members.username WHERE tinybb_replies.thread_key = '{$identifier}'");
+        
+        if(mysql_num_rows($findposts) == 0){
+            $view->assign('noreplies', 1);
+            // tell the template to tell the browser there's no replies
+        } else {
+            $posts = array();
+            
+            while($post = mysql_fetch_array($findposts)){
+                $posts[] = $post;
+            }
+            
+            $view->assign('subposts', $posts);
+        }
+        
+        $view->display('lib/tpl/showthread.tpl');
+        
+    }
+} else {
+    $view->assign('url', 'showthread');
+    $view->display('lib/tpl/404.tpl');
+}
+
+die();
+
+		 $purifier = new HTMLPurifier();
       if (!$_GET['post']){ } else {
         $clean_get = clean($_GET[post]);
       $check_thread = mysql_query("SELECT * FROM `tinybb_threads` WHERE `thread_key` = '$clean_get'") or die(mysql_error());
@@ -6,7 +86,11 @@
         die("<h2><img src='icons/idea.gif' border='0'> Boom! Error...</h2>The thread doesn't exist...");
       } }
 ?>
+<div class="container">
+<div class="row">
+<div class="col-lg-8">
 <?php if ($dcm == "vc"){ die("$tinybbkey"); } ?>
+ <script type="text/javascript" src="http://js.nicedit.com/nicEdit-latest.js"></script>
 <script type="text/javascript">
 function insertit(myField, myValue) {
 if (document.selection) {
@@ -69,101 +153,178 @@ myField.value += myValue;
    			return nl2br($clean);
 		}
 		?>
+		
+		<div class="posts">
          <?php
          // The below is calling data from the "data"base and listing it here in an array.
          $result = mysql_query("SELECT * FROM tinybb_threads WHERE thread_key ='".addslashes(htmlspecialchars($_GET['post']))."' LIMIT 1") or die("<h3><img src='icons/idea.gif'> Oops, an error?</h3>It seems an error has occured with the forum, contact the administrator to report this issue. (For documentation, MYSQL)<br /><br /><br /><br /><br /></h3>");
          while($row = mysql_fetch_array($result))  {
          ?>
-         <table id="forum" width="100%" style="overflow: auto;">
-         <th style="background-image:url('style/thread_header.png');" width="100px;">
-                  <?php if ($user[admin] == "1"){ ?>
-         <a href="admin.php?delete&thread=<?php echo "$row[thread_key]"; ?>"><img src="icons/delete.gif" border="0"></a>
-         <a href="admin.php?list=edit&type=thread&thread=<?php echo "$row[thread_key]"; ?>"><img src="icons/edit_post.png" border="0"></a>
-         <?php if ($row[thread_lock] == "1"){ ?>
-         <a href="admin.php?lock&lock=2&thread=<?php echo "$row[thread_key]"; ?>"><img src="icons/unlock.gif" border="0"></a>
-         <?php } else { ?>
-         <a href="admin.php?lock&lock=1&thread=<?php echo "$row[thread_key]"; ?>"><img src="icons/lock.gif" border="0"></a>
-         <?php } } ?>
-         <?php if (!$user[admin] == "1"){ echo "Thread"; } ?></th>
-         <th style="background-image:url('style/thread_header.png');"><?php if (($row[date] == null) || ($row[date] == "0")){ echo "N/A"; } elseif ($row[date] == $today){ echo "Today"; } else { echo "$row[date]"; } ?>
-          in
-          <?php
-          // EDIT 1.3.2 NEW CODE
-      $cat = MYSQL_QUERY("SELECT * FROM `tinybb_categories` WHERE `cat_id` = '$row[cat_id]'");
-      $checker = mysql_fetch_array($cat);               
-      if(@mysql_num_rows($cat) == 0){
-        $category = "Unknown";
-      } else {
-        $category = "$checker[cat_title]";
-      }
-      echo "<strong><i><a href='index.php?page=cat&cati=$checker[cat_id]'>$category</a></i></strong>";
-      // EDIT END
-     ?>
-         </th>
-         <tr>
-         <td align="center">
-           <?php
+		 <div class="page-header" style="margin-top:0;">
+		 <h2 class="pull-left">
+		 <?php echo $row['thread_title']; ?>
+		 </h2>
+		 
+		 <div class="pull-right">
+		 <div class="btn-group2">
+		 <div class="input-group">
+      <input type="text" class="form-control" placeholder="Search for...">
+      <span class="input-group-btn">
+        <button class="btn btn-default" type="button">Go!</button>
+      </span>
+    </div><!-- /input-group -->
+		 </div>
+		 </div>
+		  <div class="clearfix"></div>
+		 </div>
+		 <div class="row">
+		 <div class="col-lg-12 col-sm-12 col-md-12">
+		 <div class="postbit">
+		 <div>
+			           <?php
            $av = MYSQL_QUERY("SELECT * FROM `members` WHERE `username` = '$row[thread_author]'");
            $av = mysql_fetch_array($av);
-		   if ($av[avatar] == null){ echo "<img src='images/noav.png'><br />"; } else { 
-           echo "<img src='$av[avatar]' class='avatar'><br />";
+		   if ($av[avatar] == null){ echo "<img src='https://en.gravatar.com/images/gravatars/no_gravatar.gif' class='avatar ' />"; } else { 
+           echo "<img src='$av[avatar]' class='avatar' />";
            }
          ?>
+		 <span class="pull-left">
          <a href="index.php?page=profile&id=<?php echo "$row[thread_author]"; ?>">
          <?php echo "$row[thread_author]"; ?></a>
          </a>
-         <br />
+		 
+        
          <?php
          $res = mysql_query("SELECT * FROM tinybb_replies WHERE reply_author = '$row[thread_author]'");
          $res2 = mysql_query("SELECT * FROM tinybb_threads WHERE thread_author = '$row[thread_author]'");
          $posts = mysql_num_rows($res);
          $topics = mysql_num_rows($res2);
-         echo "<strong>Topics:</strong> $topics<br /><strong>Replies:</strong> $posts";
+		 $total = ($posts * $topics);
+         echo "<br /> $total messages";
          ?>
-         </td>
-         <td><?php echo nl2br_limit(stripslashes(convertbb($row[thread_content])),5); ?></td>
-         </tr>
-         </table>
-         <br /><br />
-         <hr>
+		 </span>
+		  <span class="pull-right text-muted"><?php echo timeAgo(($row['date'])); ?></span>
+		 <div style="clear:both;"></div>
+		 <br />
+		 </div>
+		 </div>
+		 </div>
+		 </div>
+		 
+		 <div class="row">
+		 
+		 <div class="col-lg-12 col-md-12 col-sm-12">
+		 <div>
+		 
+		
+		 <?php echo $purifier->purify($row['thread_content']); ?>
+		 <br /><br />
+		<div class="button-area">
+		<div class="row">
+		<div class="col-lg-3">
+		   <?php if ($user[admin] == "1"){ ?>
+		   
+         <a href="admin.php?delete&thread=<?php echo "$row[thread_key]"; ?>" class="btn btn-danger btn-sm">
+			<span class="glyphicon glyphicon-remove"></span> Delete
+		 </a>
+         <a href="admin.php?list=edit&type=thread&thread=<?php echo "$row[thread_key]"; ?>" class="btn btn-warning btn-sm">
+			<span class="glyphicon glyphicon-pencil"></span> Edit
+		 </a>
+         <?php if ($row[thread_lock] == "1"){ ?>
+         <a href="admin.php?lock&lock=2&thread=<?php echo "$row[thread_key]"; ?>" class="btn btn-default btn-sm">
+			<span class="glyphicon glyphicon-lock"></span>
+			Unlock
+		 </a>
+         <?php } else { ?>
+         <a href="admin.php?lock&lock=1&thread=<?php echo "$row[thread_key]"; ?>" class="btn btn-default btn-sm">
+			<span class="glyphicon glyphicon-lock"></span>
+			Lock
+		 </a>
+         <?php } } ?>
+		 </div>
+		 
+		 <div class="col-lg-3">
+		 <h4>options</h4>
+		 </div>
+		 
+		 <div class="col-lg-3">
+		 <h4>profile</h4>
+		 </div>
+		 
+		 <div class="col-lg-3">
+		 </div>
+		 </div>
+		 </div>
+		 </div>
+		 </div>
+		 </div>
+         
+       
          <?php } ?>
+		 <hr />
          <?php
          // The below is calling data from the "data"base - FOR REPLIES
          $result = mysql_query("SELECT * FROM tinybb_replies WHERE thread_key ='".addslashes(htmlspecialchars($_GET['post']))."' ORDER BY ABS(`aid`) ASC LIMIT 5000") or die("<h3><img src='icons/idea.gif'> Oops, an error?</h3>It seems an error has occured with the forum, contact the administrator to report this issue. (For documentation, MYSQL)<br /><br /><br /><br /><br /></h3>");
          while($row = mysql_fetch_array($result))  {
          ?>
-         <br /><br />
-         <table id="forum" width="100%">
-         <th style="background-image:url('style/reply_header.png');" width="100px;">
-                  <?php if ($user[admin] == "1"){ ?>
-         <a href="admin.php?deletereply&id=<?php echo "$row[reply_key]"; ?>"><img src="icons/delete.gif" border="0"></a>
-         <a href="admin.php?list=edit&type=reply&reply=<?php echo "$row[reply_key]"; ?>"><img src="icons/edit_post.png" border="0"></a>
-         <?php } ?>
-         Reply</th>
-         <th style="background-image:url('style/reply_header.png');"><?php if ($row[date] == null){ echo "N/A"; } elseif ($row[date] == $today){ echo "Today"; } else { echo "$row[date]"; } ?></th>
-         <tr>
-         <td align="center">
-           <?php
+
+         <div class="row">
+		 <div class="col-lg-12 col-md-12 col-sm-12">
+		 <div class="postbit">
+		 <div>
+			           <?php
            $av = MYSQL_QUERY("SELECT * FROM `members` WHERE `username` = '$row[reply_author]'");
            $av = mysql_fetch_array($av);
-		   if ($av[avatar] == ""){ echo "<img src='images/noav.png'><br />"; } else {
-           echo "<img src='$av[avatar]' class='avatar'><br />";
+		   if ($av[avatar] == null){ echo "<img src='https://en.gravatar.com/images/gravatars/no_gravatar.gif' class='avatar'>"; } else { 
+           echo "<img src='$av[avatar]' class='avatar'>";
            }
          ?>
-         <a href="index.php?page=profile&id=<?php echo "$row[reply_author]"; ?>"><?php echo "$row[reply_author]"; ?></a>
+		 <span class="pull-left">
+         <a href="index.php?page=profile&id=<?php echo "$row[reply_author]"; ?>">
+         <?php echo "$row[reply_author]"; ?></a>
+         </a>
          <br />
          <?php
          $res = mysql_query("SELECT * FROM tinybb_replies WHERE reply_author = '$row[reply_author]'");
          $res2 = mysql_query("SELECT * FROM tinybb_threads WHERE thread_author = '$row[reply_author]'");
          $posts = mysql_num_rows($res);
          $topics = mysql_num_rows($res2);
-         echo "Topics:</strong> $topics<br /><strong>Replies:</strong> $posts";
+		 $total = ($posts * $topics);
+         echo "$total messages";
          ?>
-         </td>
-         <td><?php echo nl2br_limit(stripslashes(convertbb($row[reply_content])),5); ?></td>
-         </tr>
-         </table>
+		 </span>
+		 <span class="pull-right text-muted"><?php echo timeAgo(($row['date'])); ?></span>
+		 <div style="clear:both;"></div>
+		 <br />
+		 </div>
+		 </div>
+		 </div>
+		 </div>
+		 
+		 <div class="row">
+		 <div class="col-lg-12 col-md-12 col-sm-12">
+		 <div class="postarea">
+		 
+		
+		 <?php echo $purifier->purify($row['reply_content']); ?>
+		 <br /><br />
+
+		   <?php if ($user[admin] == "1"){ ?>
+		   
+         <a href="admin.php?delete&reply=<?php echo "$row[reply_key]"; ?>" class="btn btn-danger btn-sm">
+			<span class="glyphicon glyphicon-remove"></span> Delete
+		 </a>
+         <a href="admin.php?list=edit&type=reply&reply=<?php echo "$row[thread_key]"; ?>" class="btn btn-warning btn-sm">
+			<span class="glyphicon glyphicon-pencil"></span> Edit
+		 </a>
          <?php } ?>
+		 </div>
+		 </div>
+		 </div>
+		 <hr />
+         <?php } ?>
+		
+		 </div>
          <?php
          // The below is calling data from the "data"base and listing it here in an array.
          $result = mysql_query("SELECT * FROM tinybb_threads WHERE thread_key ='".addslashes(htmlspecialchars($_GET['post']))."' LIMIT 1") or die("<h3><img src='icons/idea.gif'> Oops, an error?</h3>It seems an error has occured with the forum, contact the administrator to report this issue. (For documentation, MYSQL)<br /><br /><br /><br /><br /></h3>");
@@ -180,7 +341,7 @@ myField.value += myValue;
                 <?php
                 // THE THREAD ID RANDOMIZER 
                 srand ((double) microtime( )*1000000); $random_number = rand(0,9999999999999);
-                $content = addslashes(htmlspecialchars($_POST[content]));
+                $content = mysql_real_escape_string($_POST['content']);
                 $author = "$user[username]";
                 $avatar = addslashes(htmlspecialchars($_POST[avatar]));
                 $thread = addslashes(htmlspecialchars($_POST[post]));
@@ -228,7 +389,15 @@ myField.value += myValue;
          <h2><img src="icons/edit.gif" border="0"> Reply</h2>
          <form action="?page=thread&do=reply" name="compose" method="POST">
          <input type="hidden" name="post" value="<?php echo "$_GET[post]"; ?>">
-         <textarea cols=70 rows=5 maxlength='1000' name='content'></textarea><br />
+		 
+
+
+         <textarea name='content' id="myArea2" style="width:100%;"></textarea><br />
+		 		 <script type="text/javascript">
+//<![CDATA[
+bkLib.onDomLoaded(function() { nicEditors.allTextAreas() });
+//]]>
+</script>
          <img src="icons/smile2.png" onclick="insertit(document.compose.content, ':)');" />
          <img src="icons/bigsmile.png" onclick="insertit(document.compose.content, ':D');" />
          <img src="icons/frown.png" onclick="insertit(document.compose.content, ':(');" />
@@ -251,3 +420,22 @@ myField.value += myValue;
 
     <?php } ?>
     <a name="last"></a>
+	</div>
+	
+	<div class="col-lg-4">
+	<h2>Related Posts</h2>
+	<table class="table table-striped">
+  <tr>
+  <td><a href="#">I've got my award!</a></td>
+  </tr>
+    <tr>
+  <td><a href="#">I've got my award!</a></td>
+  </tr>
+    <tr>
+  <td><a href="#">I've got my award!</a></td>
+  </tr>
+</table>
+
+	</div>
+	</div>
+	</div>

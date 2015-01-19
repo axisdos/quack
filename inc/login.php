@@ -15,14 +15,14 @@ $checker = mysql_fetch_array($check_user_data2);
 if(isset($_POST['login'])){
 $password = htmlentities(clean(trim(sha1(md5(md5(sha1(md5(sha1(sha1(md5($_POST[password])))))))))));
 if($username == NULL OR $password == NULL){
-$final_report.="<div class='warning'>Please fill in the username & password</div><br />";
+$final_report.="<div class='alert alert-warning'>Please fill in the username & password</div><br />";
 }else{
 $check_user_data = mysql_query("SELECT * FROM `members` WHERE `username` = '$username'") or die(mysql_error());
 if(mysql_num_rows($check_user_data) == 0){
-$final_report.="<div class='warning'>Username doesn't exist, why not <a href=\"?page=register\">Register</a>!</div><br />";
+$final_report.="<div class='alert alert-warning'>Username doesn't exist, why not <a href=\"?page=register\">Register</a>!</div><br />";
 }elseif($checker[admin] == "3"){ 
   
-  $final_report.="<div class='warning'>The account is banned, you cannot login.</div><br />";
+  $final_report.="<div class='alert alert-warning'>The account is banned, you cannot login.</div><br />";
 
 }else{
 $get_user_data = mysql_fetch_array($check_user_data);
@@ -37,24 +37,32 @@ if ($_GET['return'] == "admin"){
   header("Location: index.php?page=usercp");
 }
 } else {
-  echo "<div class='warning'>Username and/or password was incorrect.</div>";
+  echo "<div class='alert alert-warning'>Username and/or password was incorrect.</div>";
 }
 }}}
 ?>
-<table id="forum">
-<th style="background-image:url('style/thread_header.png');">Login</th>
+<div class="panel panel-default">
+<div class="panel-heading">Login</div>
+<div class="panel-body">
+
 <?php echo "$final_report"; ?>
-<tr><td>
+
 <form action="" method="post">
 
-    Username:<br />
-      <input type="text" name="username" size="30" autocomplete="off" maxlength="25">
-      <br /><br />
-    Password:<br />
-    <input type="password" name="password" size="30" autocomplete="off" maxlength="25">
-     <br /><br />
-     <input type="submit" name="login" value="Login" />
+<div class="form-group">
+	<label for="username">Username</label>
+	<input type="text" class="form-control" placeholder="" name="username" />
+</div>
+
+<div class="form-group">
+	<label for="password">Password</label>
+	<input type="password" class="form-control" placeholder="" name="password" />
+</div>
+  
+<div class="form-group">
+	<input type="submit" name="login" value="Login" class="btn btn-info" />
+</div>
 
 </form>
-</tr></td>
-</table>
+</div>
+</div>
