@@ -20,7 +20,7 @@ if(isset($_POST['change_password'])){
 	} elseif($repeat_password != $new_password){
 		$profile_message = "You didn't repeat the new password correctly";
 	} else {
-		mysql_query("UPDATE `members` SET `password` = '$repeat_password' WHERE `username` = '" . $user['username'] . "'");
+		mysqli_query($conn,"UPDATE `members` SET `password` = '$repeat_password' WHERE `username` = '" . $user['username'] . "'");
 		$profile_message = "Your password was changed successfully";
 	}
 }

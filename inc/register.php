@@ -28,8 +28,8 @@ $final_report.= "<div class='warning'>Please fill in all fields!</span>";
 if(strlen($username) <= 3 || strlen($username) >= 30){
 $final_report.="<div class='warning'>Your username must be between 3 and 30 characters.</span>";
 }else{
-$check_members = mysql_query("SELECT * FROM `members` WHERE `username` = '$username'");   
-if(mysql_num_rows($check_members) != 0){
+$check_members = mysqli_query($conn,"SELECT * FROM `members` WHERE `username` = '$username'");   
+if(mysqli_num_rows($check_members) != 0){
 $final_report.="<div class='warning'>The username you are attempting to register is taken.</div><br />";
 }else{
 if(strlen($password) <= 5 || strlen($password) >= 100){
@@ -38,7 +38,7 @@ $final_report.="<div class='warning'>Your password must be between 6 and 12 digi
 if(!eregi("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$", $email)){ 
 $final_report.="<div class='warning'>Please enter a valid email address.</div><br />";
 }else{
-$create_member = mysql_query("INSERT INTO `members` (`id`,`username`, `password`, `email`, `ip`, `date`) 
+$create_member = mysqli_query($conn,"INSERT INTO `members` (`id`,`username`, `password`, `email`, `ip`, `date`) 
 VALUES('','$username','$password','$email','$memip','$date')");
 $final_report.="<meta http-equiv='Refresh' content='0; URL=?page=registered'/>";
 }}}}}

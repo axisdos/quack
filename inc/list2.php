@@ -1,4 +1,19 @@
-<?php include("inc/header.php"); ?>
+<?php include("inc/header.php");
+
+
+
+if(strpos($_GET['page'], '/') !== false){
+    require_once 'app/classes/WebHandler.php';
+    $controller = explode('/', $_GET['page']);
+    ucfirst($controller[0]);
+    if(file_exists('app/classes/' . $controller[0] . 'Handler.php')){
+        require_once 'app/classes/'. $controller[0] . 'Handler.php';
+        $n = $controller[0] . "Handler";
+        $p = new $n();
+        $page = 'none';
+    }
+}
+?>
 
     <?php if ($page == "register"){ include("inc/register.php"); }
     elseif ($page == "login") { include("inc/login.php"); } 
@@ -12,7 +27,7 @@
     elseif ($page == "thread"){ include("inc/viewthread.php"); }
     elseif ($page == "cat"){ include("inc/categories.php"); }
     elseif ($page == "news"){ include("inc/news.php"); }
-    else {  ?>
+    elseif ($page != "none") {  ?>
 
     <?php if (($bbsetting[tinybb_guest_access] == "0") && ($user[username] == null)){ echo "<center><span style='color:red; font-weight:bold;'>Guests are not allowed to browse $bbtitle</span></center>"; include("login.php"); } else { ?>
     <?php if (($bbsetting[tinybb_maintenance] == "0") && (!$user[admin] == "1")){ echo "<table id='forum'><th style=\"background-image:url('style/thread_header.png')\">Forum Maintenance</th><tr><td>$bbsetting[tinybb_maintenance_message]</td></tr></table>"; } else { ?>
@@ -61,11 +76,11 @@ font-family:Arial, Helvetica, sans-serif;
 	$limit = 100;
 
 	$query = "SELECT COUNT(*) as num FROM $tableName";
-	$total_pages = mysql_fetch_array(mysql_query($query));
+	$total_pages = mysqli_fetch_array(mysqli_query($conn,$query));
 	$total_pages = $total_pages[num];
 	
 	$stages = 3;
-	$page = mysql_escape_string($_GET['page']);
+	$page = mysqli_real_escape_string($conn,$_GET['page']);
 	if($page){
 		$start = ($page - 1) * $limit; 
 	}else{
@@ -74,7 +89,7 @@ font-family:Arial, Helvetica, sans-serif;
 
     // Get page data
 	$query1 = "SELECT * FROM $tableName ORDER BY ABS(`cat_order`) ASC LIMIT $start, $limit ";
-	$result = mysql_query($query1);
+	$result = mysqli_query($conn,$query1);
  
 	// Initial page num setup
 	if ($page == 0){$page = 1;}
@@ -180,7 +195,7 @@ font-family:Arial, Helvetica, sans-serif;
 <th style="background-image:url('style/thread_header.png');"><center>Newest Thread</center></th>
 <th style="background-image:url('style/thread_header.png');"></th>
 <?php
- while($row = @mysql_fetch_array($result))
+ while($row = @mysqli_fetch_array($result))
 		{
                   ?>
                             
@@ -191,15 +206,15 @@ font-family:Arial, Helvetica, sans-serif;
                             <td align="center">
                             <?php
                                  $sql2 = "SELECT * FROM tinybb_threads WHERE cat_id = '$row[cat_id]' ORDER BY aid DESC LIMIT 1";
-                                 $tt = mysql_query($sql2) or die (mysql_error());
-                                 while($p=mysql_fetch_assoc($tt)){
+                                 $tt = mysqli_query($conn,$sql2) or die (mysqli_error());
+                                 while($p=mysqli_fetch_assoc($tt)){
                                  $author = stripslashes($p[thread_title]);
                                  echo "<a href=\"?page=thread&post=".$p['thread_key']."\">$author</a>";
                                  ?>
                                 <?php
                                  $latest = "SELECT * FROM tinybb_replies WHERE thread_key = '$p[thread_key]' ORDER BY aid DESC LIMIT 1";
-                                 $rlatest = mysql_query($latest) or die (mysql_error());
-                                 while($tr=mysql_fetch_assoc($rlatest)){
+                                 $rlatest = mysqli_query($conn,$latest) or die (mysqli_error());
+                                 while($tr=mysqli_fetch_assoc($rlatest)){
                                  ?>
                                  <br /><span style="font-size:9px;">Newest Post: <?php echo "<a href=\"?page=profile&id=".$tr['reply_author']."\"><span style='font-size:10px'>".$tr['reply_author']."</span></a>"; ?></span>
                                  <?php
@@ -209,15 +224,15 @@ font-family:Arial, Helvetica, sans-serif;
                                 }
                                 ?>
                                 <?php
-                                $result3 = mysql_query("SELECT * FROM tinybb_threads WHERE cat_id = '$row[cat_id]'");
-                                $rthreads = mysql_num_rows($result3);
+                                $result3 = mysqli_query($conn,"SELECT * FROM tinybb_threads WHERE cat_id = '$row[cat_id]'");
+                                $rthreads = mysqli_num_rows($result3);
                                 if ($rthreads == "0"){ echo "No Threads"; }
                                 ?>
                             </td>
                             <td align="center">
                             <?php
-                                $result3 = mysql_query("SELECT * FROM tinybb_threads WHERE cat_id = '$row[cat_id]'");
-                                $rthreads = mysql_num_rows($result3);
+                                $result3 = mysqli_query($conn,"SELECT * FROM tinybb_threads WHERE cat_id = '$row[cat_id]'");
+                                $rthreads = mysqli_num_rows($result3);
                                 if ($rthreads == "1"){ echo "$rthreads Thread"; } else {
                                 echo "$rthreads Threads";
                                 }
@@ -237,13 +252,13 @@ font-family:Arial, Helvetica, sans-serif;
 <span style="font-size:15px; font-weight:bold;">Who's Online</span><br />
 <?php
 include("inc/online.php"); //get online configuration and such
-$get_online_users = mysql_query("SELECT * FROM `members` WHERE `online` >= '$offline' ORDER BY `id` ASC"); //get all online users
-$total_users = mysql_num_rows($get_online_users); 
+$get_online_users = mysqli_query($conn,"SELECT * FROM `members` WHERE `online` >= '$offline' ORDER BY `id` ASC"); //get all online users
+$total_users = mysqli_num_rows($get_online_users); 
 if($total_users == 0){ //see if anyone is logged in 
     echo "There are no users online."; //there isn't =O 
 }else{ //maybe.... 
     $i = 1; //the variable 'i' is 1
-    while($online = mysql_fetch_array($get_online_users)){ //loop online users 
+    while($online = mysqli_fetch_array($get_online_users)){ //loop online users 
         if(($i > 0) && ($i != $total_users)){ //see if i is the same or not of total online users 
             $comma = ', '; //if it isn't then theres a comma 
         }else{ //or.... 
@@ -266,8 +281,8 @@ if($total_users == 0){ //see if anyone is logged in
 <span style="font-size:14px;"><?php echo "$stats"; ?></span><br /><br />
 <?php
 $sql = "SELECT * FROM members ORDER BY id DESC LIMIT 1";
-$res = mysql_query($sql) or die (mysql_error());
-while($r=mysql_fetch_assoc($res)){
+$res = mysqli_query($conn,$sql) or die (mysqli_error());
+while($r=mysqli_fetch_assoc($res)){
 echo "Welcome to our latest member, <strong><a href=\"?page=profile&id=".$r['username']."\">".$r['username']."</a></strong>!<br>";
 }
 ?>

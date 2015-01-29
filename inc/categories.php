@@ -1,7 +1,7 @@
 <?php
       $catid = clean($_GET[cati]);
-      $check_category = mysql_query("SELECT * FROM `tinybb_categories` WHERE `cat_id` = '$catid'") or die(mysql_error());
-      if(mysql_num_rows($check_category) == 0){
+      $check_category = mysqli_query($conn,"SELECT * FROM `tinybb_categories` WHERE `cat_id` = '$catid'") or die(mysqli_error());
+      if(mysqli_num_rows($check_category) == 0){
         die("<h2><img src='icons/idea.gif' border='0'> Boom! Error...</h2>The category you're attempting to view doesn't exist...");
       }
 ?>
@@ -49,11 +49,11 @@ font-family:Arial, Helvetica, sans-serif;
 	$limit = $bbsetting[tinybb_list_amount];
 
 	$query = "SELECT COUNT(*) as num FROM $tableName WHERE `cat_id` = '$catid'";
-	$total_pages = mysql_fetch_array(mysql_query($query));
+	$total_pages = mysqli_fetch_array(mysqli_query($conn,$query));
 	$total_pages = $total_pages[num];
 	
 	$stages = 3;
-	$page = mysql_escape_string($_GET['c']);
+	$page = mysqli_real_escape_string($conn,$_GET['c']);
 	if($page){
 		$start = ($page - 1) * $limit; 
 	}else{
@@ -62,7 +62,7 @@ font-family:Arial, Helvetica, sans-serif;
 	
     // Get page data
 	$query1 = "SELECT * FROM $tableName WHERE `cat_id` = '$catid' ORDER BY ABS(`aid`) DESC LIMIT $start, $limit";
-	$result = mysql_query($query1);
+	$result = mysqli_query($conn,$query1);
 	
 	// Initial page num setup
 	if ($page == 0){$page = 1;}
@@ -161,44 +161,44 @@ font-family:Arial, Helvetica, sans-serif;
 }echo "";
 ?>
 <?php
-      $cat = MYSQL_QUERY("SELECT * FROM `tinybb_categories` WHERE `cat_id` = '$catid'");
-      $checker = mysql_fetch_array($cat);               
-      if(@mysql_num_rows($cat) == 0){
+      $cat = mysqli_query($conn,"SELECT * FROM `tinybb_categories` WHERE `cat_id` = '$catid'");
+      $checker = mysqli_fetch_array($cat);               
+      if(@mysqli_num_rows($cat) == 0){
         $category = "Unknown";
       } else {
         $category = "$checker[cat_title]";
       }
-      echo "<img src='icons/idea.gif' border='0'> Currently Browsing <strong>$category</strong>";
+      echo "<span style=\"line-height:31px;\"><img src='icons/idea.gif' border='0'> Currently Browsing <strong>$category</strong></span>";
 ?>
-<?php if (!$user[username] == ""){ ?><span style="float:right"><img src="icons/none.gif" border="0"> <a href="index.php?page=addthread&cat=<?php echo $_GET[cati]; ?>">Create a thread</a><br /></span><?php } ?><br /><br />
+<?php if (!$user[username] == ""){ ?><span style="float:right"> <a class="btn btn-primary" href="index.php?page=addthread&cat=<?php echo $_GET[cati]; ?>">Create a thread</a><br /></span><?php } ?><br /><br />
 <?php  echo $paginate; ?>
-<table id="forum">
-<th style="background-image:url('style/thread_header.png');"></th>
-<th style="background-image:url('style/thread_header.png');"><center>Thread Title</center></th>
-<th style="background-image:url('style/thread_header.png');"><center>Thread Author</center></th>
-<th style="background-image:url('style/thread_header.png');"><center>Last Reply</center></th>
-<th style="background-image:url('style/thread_header.png');"></th>
+<table class="table table-striped">
+<th></th>
+<th>Title</th>
+<th>Author</th>
+<th>Latest Comment</th>
+<th></th>
 <?php
- while($row = mysql_fetch_array($result))
+ while($row = mysqli_fetch_array($result))
 		{
                   ?>
                             
                             <tr>
-                            <td align="center"><?php if ($row[thread_lock] == "1"){ echo "<img src='icons/lock.gif' border='0'>"; } else { ?><img src='icons/none.gif' border='0'><?php } ?></td>
-                            <td align="center"><a href="?page=thread&post=<?php echo "$row[thread_key]"; ?>"><?php $title = stripslashes($row[thread_title]); echo "$title"; ?></a></td>
-                            <td align="center"><a href="?page=profile&id=<?php echo "$row[thread_author]"; ?>"><?php echo "$row[thread_author]"; ?></a></td>
-                            <td align="center">
+                            <td><?php if ($row[thread_lock] == "1"){ echo "<img src='icons/lock.gif' border='0'>"; } else { ?><img src='icons/none.gif' border='0'><?php } ?></td>
+                            <td><a href="thread/<?php echo "$row[thread_key]"; ?>"><?php $title = stripslashes($row[thread_title]); echo "$title"; ?></a></td>
+                            <td><a href="?page=profile&id=<?php echo "$row[thread_author]"; ?>"><?php echo "$row[thread_author]"; ?></a></td>
+                            <td>
                             
  <?php
 $sql2 = "SELECT * FROM tinybb_replies WHERE thread_key = '$row[thread_key]' ORDER BY aid DESC LIMIT 1";
-$tt = mysql_query($sql2) or die (mysql_error());
-while($p=mysql_fetch_assoc($tt)){
+$tt = mysqli_query($conn,$sql2) or die (mysqli_error());
+while($p=mysqli_fetch_assoc($tt)){
   if ($p['reply_key'] == 0){ echo "No Replies"; } 
 echo "<a href=\"?page=profile&id=".$p['reply_author']."\">".$p['reply_author']."</a>";
 }
 
-                                $result3 = mysql_query("SELECT * FROM tinybb_replies WHERE thread_key = '$row[thread_key]'");
-                                $rthreads = mysql_num_rows($result3);
+                                $result3 = mysqli_query($conn,"SELECT * FROM tinybb_replies WHERE thread_key = '$row[thread_key]'");
+                                $rthreads = mysqli_num_rows($result3);
                                 if ($rthreads == "0"){ echo "No Replies"; }
 
 
@@ -208,8 +208,8 @@ echo "<a href=\"?page=profile&id=".$p['reply_author']."\">".$p['reply_author']."
                             </td>
                             <td align="center">
                             <?php
-                            $result4 = mysql_query("SELECT * FROM tinybb_replies WHERE thread_key = '$row[thread_key]'");
-                            $treplies = mysql_num_rows($result4);
+                            $result4 = mysqli_query($conn,"SELECT * FROM tinybb_replies WHERE thread_key = '$row[thread_key]'");
+                            $treplies = mysqli_num_rows($result4);
                             echo "<strong>$treplies</strong> replies";
                             ?>
                             </td>

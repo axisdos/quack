@@ -43,11 +43,11 @@ font-family:Arial, Helvetica, sans-serif;
 	$limit = 100;
 
 	$query = "SELECT COUNT(*) as num FROM $tableName";
-	$total_pages = mysql_fetch_array(mysql_query($query));
+	$total_pages = mysqli_fetch_array(mysqli_query($conn,$query));
 	$total_pages = $total_pages[num];
 	
 	$stages = 3;
-	$page = mysql_escape_string($_GET['page']);
+	$page = mysqli_real_escape_string($conn,$_GET['page']);
 	if($page){
 		$start = ($page - 1) * $limit; 
 	}else{
@@ -56,7 +56,7 @@ font-family:Arial, Helvetica, sans-serif;
 
     // Get page data
 	$query1 = "SELECT * FROM $tableName ORDER BY cat_order ASC LIMIT $start, $limit ";
-	$result = mysql_query($query1);
+	$result = mysqli_query($conn,$query1);
  
 	// Initial page num setup
 	if ($page == 0){$page = 1;}
@@ -164,7 +164,7 @@ font-family:Arial, Helvetica, sans-serif;
 <th style="background-image:url('style/thread_header.png');"><center>Order</center></th>
 <th style="background-image:url('style/thread_header.png');"><center>Admin Tools</center></th>
 <?php
- while($row = @mysql_fetch_array($result))
+ while($row = @mysqli_fetch_array($result))
 		{
                   ?>
 
@@ -175,16 +175,16 @@ font-family:Arial, Helvetica, sans-serif;
                             <td align="center">
                             <?php
                                  $sql2 = "SELECT * FROM tinybb_threads WHERE cat_id = '$row[cat_id]' ORDER BY aid DESC LIMIT 1";
-                                 $tt = mysql_query($sql2) or die (mysql_error());
-                                 while($p=mysql_fetch_assoc($tt)){
+                                 $tt = mysqli_query($conn,$sql2) or die (mysqli_error());
+                                 while($p=mysqli_fetch_assoc($tt)){
                                  echo "<a href=\"index.php?page=thread&post=".$p['thread_key']."\">".$p['thread_title']."</a>";
                                 }
                                 ?>
                             </td>
                             <td align="center">
                             <?php
-                                $result3 = mysql_query("SELECT * FROM tinybb_threads WHERE cat_id = '$row[cat_id]'");
-                                $rthreads = mysql_num_rows($result3);
+                                $result3 = mysqli_query($conn,"SELECT * FROM tinybb_threads WHERE cat_id = '$row[cat_id]'");
+                                $rthreads = mysqli_num_rows($result3);
                                 if ($rthreads == "1"){ echo "$rthreads Thread"; } else {
                                 echo "$rthreads Threads";
                                 }

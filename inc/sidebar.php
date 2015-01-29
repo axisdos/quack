@@ -16,11 +16,11 @@
     <li><a href="index.php?page=usercp">Account</a></li>
     <?php
 	$username = $_SESSION['username'];
-	$getid= mysql_query("SELECT id FROM members WHERE username = '".$username."'");
+	$getid= mysqli_query($conn,"SELECT id FROM members WHERE username = '".$username."'");
 	$getid = mysql_fetch_row($getid);
 	$getid = $getid[0];
-        $query = mysql_query("SELECT * FROM private WHERE to_id = ".$getid." AND is_deleted = 'no' AND is_permdeleted = 'no' AND status ='unread'");
-	$number = mysql_num_rows($query);
+        $query = mysqli_query($conn,"SELECT * FROM private WHERE to_id = ".$getid." AND is_deleted = 'no' AND is_permdeleted = 'no' AND status ='unread'");
+	$number = mysqli_num_rows($query);
 	if($number == 0) {
 	?><li><a href="index.php?page=private&inbox">Private Messages</a></li>
 	<?php } elseif($number >= 1){?>

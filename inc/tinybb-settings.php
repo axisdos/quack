@@ -3,10 +3,7 @@
 // TinyBB 1.0 - www.TinyBB.net
 // Jake Steele 
 ###################
-@session_start();     
-include("config.php"); // Config.php located in your root forum directory contains all data needed to execute scripts from this page
-                
-                
+session_start();     
                 // Here is the cleaning function which helps to prevent against SQL injection, used on all public query codes (unless not needed)
                 function clean($input) {
 			if(is_array($input)){
@@ -22,27 +19,27 @@ include("config.php"); // Config.php located in your root forum directory contai
 		
 
 
-$user = MYSQL_QUERY("SELECT * FROM `members` WHERE `username` = '$_SESSION[username]'");
-$user = mysql_fetch_array($user);
+$user = mysqli_query($conn,"SELECT * FROM `members` WHERE `username` = '$_SESSION[username]'");
+$user = mysqli_fetch_array($user);
 
-$settingsql = MYSQL_QUERY("SELECT * FROM `tinybb_settings`");
-$bbsetting = mysql_fetch_array($settingsql);
+$settingsql = mysqli_query($conn,"SELECT * FROM `tinybb_settings`");
+$bbsetting = mysqli_fetch_array($settingsql);
 
 $profile2 = clean($_GET[id]);
-$sql = MYSQL_QUERY("SELECT * FROM `members` WHERE `username` = '$profile2'");
-$profile = mysql_fetch_array($sql);
+$sql = mysqli_query($conn,"SELECT * FROM `members` WHERE `username` = '$profile2'");
+$profile = mysqli_fetch_array($sql);
 
 $page = $_GET['page'];
 $today = date("d-m-Y");
 
 // Stat database
 if ($bbsetting[tinybb_stats] == "1"){
-$result = mysql_query("SELECT * FROM tinybb_threads");
-$threads = mysql_num_rows($result);
-$result2 = mysql_query("SELECT * FROM tinybb_replies");
-$replies = mysql_num_rows($result2);
-$result3 = mysql_query("SELECT * FROM members");
-$members = mysql_num_rows($result3);
+$result = mysqli_query($conn,"SELECT * FROM tinybb_threads");
+$threads = mysqli_num_rows($result);
+$result2 = mysqli_query($conn,"SELECT * FROM tinybb_replies");
+$replies = mysqli_num_rows($result2);
+$result3 = mysqli_query($conn,"SELECT * FROM members");
+$members = mysqli_num_rows($result3);
 }
 
 if ($bbsetting[tinybb_stats] == "1"){ $stats = "<img src='icons/stats_png.png'> $threads threads, $replies replies, $members members"; }

@@ -38,8 +38,8 @@
 		?>
 <?php
 $sql2 = "SELECT * FROM tinybb_news ORDER BY news_id DESC";
-$tt = mysql_query($sql2) or die (mysql_error());
-while($p=mysql_fetch_assoc($tt)){ ?>
+$tt = mysqli_query($conn,$sql2) or die (mysqli_error());
+while($p=mysqli_fetch_assoc($tt)){ ?>
 <table id="forum" width="100%">
 <th style="background-image:url('style/thread_header.png');" width="100px;">
         <?php if ($user[admin] == "1"){ 
@@ -52,8 +52,8 @@ while($p=mysql_fetch_assoc($tt)){ ?>
 <th style="background-image:url('style/thread_header.png');" width="500px;"><?php echo "$p[news_title]"; ?> | Posted: <?php echo "$p[news_date]"; ?></th>
 <tr>         <td align="center">
            <?php
-           $av = MYSQL_QUERY("SELECT * FROM `members` WHERE `username` = '$p[news_author]'");
-           $av = mysql_fetch_array($av);
+           $av = mysqli_query($conn,"SELECT * FROM `members` WHERE `username` = '$p[news_author]'");
+           $av = mysqli_fetch_array($av);
 		   if ($av[avatar] == null){ echo "<img src='images/noav.png'><br />"; } else { 
            echo "<img src='$av[avatar]' class='avatar'><br />";
            }

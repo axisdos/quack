@@ -5,7 +5,7 @@
 ###################
 session_start();
 include_once"config.php";;
-$update = mysql_query("UPDATE `members` SET `online` = '' WHERE `username` = '$user[username]';");
+$update = mysqli_query($conn,"UPDATE `members` SET `online` = '' WHERE `username` = '$user[username]';");
 session_unset('username');
 session_unset('password');
 echo "<meta http-equiv='Refresh' content='0; URL=index.php'/>";

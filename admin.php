@@ -453,7 +453,7 @@ background-image:url('style/thread_header.png');
          <?php
           $message = addslashes(htmlspecialchars($_POST[notice]));
           $rules = addslashes(htmlspecialchars($_POST[rules]));
-          $update = mysql_query("UPDATE `admin` SET
+          $update = mysqli_query($conn,"UPDATE `admin` SET
           `admin_message` = '$message',
           `rules` = '$rules'
           ") or die("<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=admin.php?list=modcp&m=2\">");
@@ -461,8 +461,8 @@ background-image:url('style/thread_header.png');
           <?php die("<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=admin.php?list=modcp&m=1\">"); ?>
          <?php } else { ?>
          <?php
-         $notes = MYSQL_QUERY("SELECT * FROM `admin`");
-         $notes = mysql_fetch_array($notes);
+         $notes = mysqli_query($conn,"SELECT * FROM `admin`");
+         $notes = mysqli_fetch_array($notes);
          ?>
         <?php 
         if ($_GET['m'] == "1"){ echo "<br /><div class='success'>Moderator Settings updated.</div>"; }
@@ -489,8 +489,8 @@ background-image:url('style/thread_header.png');
          ?>
          <?php
          $thread = $_GET['thread'];
-         $sql = MYSQL_QUERY("SELECT * FROM `tinybb_threads` WHERE `thread_key` = '$thread'");
-         $setting = mysql_fetch_array($sql);
+         $sql = mysqli_query($conn,"SELECT * FROM `tinybb_threads` WHERE `thread_key` = '$thread'");
+         $setting = mysqli_fetch_array($sql);
          ?>
          <?php if ($_GET['do'] == "update"){ ?>
 
@@ -501,7 +501,7 @@ background-image:url('style/thread_header.png');
           $cat_id = addslashes(htmlspecialchars($_POST[category]));
           $id = $_POST['id'];
           if ((($title == "") || ($author == "") || ($content == ""))){ die("<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=admin.php?list=edit&m=3\">"); }
-          $update = mysql_query("UPDATE `tinybb_threads` SET
+          $update = mysqli_query($conn,"UPDATE `tinybb_threads` SET
           `thread_title` = '$title',
           `cat_id` = '$cat_id',
           `thread_author` = '$author',
@@ -525,8 +525,8 @@ background-image:url('style/thread_header.png');
          <option value="<?php echo "$setting[cat_id]"; ?>"><strong><i>No Change</i></strong>
          <?php
          $query5 = "SELECT * FROM tinybb_categories";
-         $result5 = mysql_query($query5);
-         while($row5 = mysql_fetch_array($result5, MYSQL_ASSOC)){
+         $result5 = mysqli_query($conn,$query5);
+         while($row5 = mysqli_fetch_array($result5, MYSQL_ASSOC)){
          echo "<option value='$row5[cat_id]'>$row5[cat_title]";
          }
          ?>
@@ -542,8 +542,8 @@ background-image:url('style/thread_header.png');
          
          <?php
          $thread = $_GET['reply'];
-         $sql = MYSQL_QUERY("SELECT * FROM `tinybb_replies` WHERE `reply_key` = '$thread'");
-         $setting = mysql_fetch_array($sql);
+         $sql = mysqli_query($conn,"SELECT * FROM `tinybb_replies` WHERE `reply_key` = '$thread'");
+         $setting = mysqli_fetch_array($sql);
          ?>
          
                   <?php if ($_GET['do'] == "update"){ ?>
@@ -552,7 +552,7 @@ background-image:url('style/thread_header.png');
           $author2 = addslashes(htmlspecialchars($_POST[author]));
           $content2 = addslashes(htmlspecialchars($_POST[content]));
           $id = $_POST['id'];
-          $update = mysql_query("UPDATE `tinybb_replies` SET
+          $update = mysqli_query($conn,"UPDATE `tinybb_replies` SET
           `reply_author` = '$author2',
           `reply_content` = '$content2'
 
@@ -589,7 +589,7 @@ background-image:url('style/thread_header.png');
           $maintenance_message = addslashes(htmlspecialchars($_POST[maintenance_message]));
           $registration = addslashes(htmlspecialchars($_POST[register]));
           if ((((($title == "") || ($guests == "") || ($categories == "") || ($maintenance == "") || ($registration == ""))))){ die("<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=admin.php?list=settings&m=3\">"); }
-          $update = mysql_query("UPDATE `tinybb_settings` SET
+          $update = mysqli_query($conn,"UPDATE `tinybb_settings` SET
           `tinybb_title` = '$title',
           `tinybb_guest_access` = '$guests',
           `tinybb_stats` = '$stats',
@@ -603,8 +603,8 @@ background-image:url('style/thread_header.png');
           <?php echo "<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=admin.php?list=settings&m=1\">"; ?>
          <?php } else { ?>
          <?php
-         $sql = MYSQL_QUERY("SELECT * FROM `tinybb_settings`");
-         $setting = mysql_fetch_array($sql);
+         $sql = mysqli_query($conn,"SELECT * FROM `tinybb_settings`");
+         $setting = mysqli_fetch_array($sql);
          ?>
          <?php if ($_GET['m'] == "1"){ echo "<br /><div class='success'>Forum settings successfully updated.</div>"; }
          elseif ($_GET['m'] == "2"){ echo "<br /><div class='error'>There was an SQL error while attempting to update the forum settings.</div>"; }
@@ -648,16 +648,16 @@ background-image:url('style/thread_header.png');
          <?php if ($_GET['do'] == "delete"){ ?>
          <?php
          $catid = clean($_GET[cat]);
-         $sql = MYSQL_QUERY("SELECT * FROM `tinybb_categories` WHERE `cat_id` = '$catid'");
-         $checker = mysql_fetch_array($sql);
+         $sql = mysqli_query($conn,"SELECT * FROM `tinybb_categories` WHERE `cat_id` = '$catid'");
+         $checker = mysqli_fetch_array($sql);
          ?>
          <h2><img src="icons/idea.gif" border="0"> Delete <?php echo "$checker[cat_title]"; ?></h2>
          <div class="alert" style="font-size:13px; font-weight:bold;">Please use this feature carefully, deleting a category is permanent!</div>
 
          <?php if (!$_GET['con'] == "1"){ ?>
          <?php
-         $check_category = mysql_query("SELECT * FROM `tinybb_categories` WHERE `cat_id` = '$catid'") or die(mysql_error());
-         if(mysql_num_rows($check_category) == 0){
+         $check_category = mysqli_query($conn,"SELECT * FROM `tinybb_categories` WHERE `cat_id` = '$catid'") or die(mysqli_error());
+         if(mysqli_num_rows($check_category) == 0){
          die("<h2><img src='icons/idea.gif' border='0'> Error</h2>The category you're attempting to delete doesn't exist...");
          }
          ?>
@@ -684,14 +684,14 @@ background-image:url('style/thread_header.png');
          $idtmt = addslashes(htmlspecialchars($_POST[idtmt]));
          if (!$confirm == "1"){ die("<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=admin.php?list=categories&m=9\">"); }
          if (empty($idtmt)){ die("You must choose a category to move existing threads to."); }
-         $check_category = mysql_query("SELECT * FROM `tinybb_categories` WHERE `cat_id` = '$_POST[idtmt]'") or die(mysql_error());
-         if(mysql_num_rows($check_category) == 0){
+         $check_category = mysqli_query($conn,"SELECT * FROM `tinybb_categories` WHERE `cat_id` = '$_POST[idtmt]'") or die(mysqli_error());
+         if(mysqli_num_rows($check_category) == 0){
          die("<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=admin.php?list=categories&m=8\">");
          }
          ?>
          
-         <?php mysql_query("DELETE FROM tinybb_categories WHERE cat_id='$id'") or die("<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=admin.php?list=categories&m=7\">"); ?>
-         <?php $update = mysql_query("UPDATE `tinybb_threads` SET `cat_id` = '$idtmt' WHERE `cat_id` = '$id'") or die("<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=admin.php?list=categories&m=6\">"); ?>
+         <?php mysqli_query($conn,"DELETE FROM tinybb_categories WHERE cat_id='$id'") or die("<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=admin.php?list=categories&m=7\">"); ?>
+         <?php $update = mysqli_query($conn,"UPDATE `tinybb_threads` SET `cat_id` = '$idtmt' WHERE `cat_id` = '$id'") or die("<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=admin.php?list=categories&m=6\">"); ?>
          <?php die("<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=admin.php?list=categories&m=10\">"); ?>
          <?php } ?>
          <?php } elseif ($_GET['do'] == "settings"){ ?>
@@ -699,13 +699,13 @@ background-image:url('style/thread_header.png');
          <?php if ($_GET['s'] == "2"){ ?>
          <?php
          $amount = addslashes(htmlspecialchars($_POST[number]));
-         $update = mysql_query("UPDATE `tinybb_settings` SET `tinybb_list_amount` = '$amount'") or die("<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=admin.php?list=categories&m=5\">");
+         $update = mysqli_query($conn,"UPDATE `tinybb_settings` SET `tinybb_list_amount` = '$amount'") or die("<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=admin.php?list=categories&m=5\">");
          ?>
          <?php die("<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=admin.php?list=categories&m=4\">"); ?>
          <?php } else { ?>
          <?php
-         $sql = MYSQL_QUERY("SELECT * FROM `tinybb_settings`");
-         $setting = mysql_fetch_array($sql);
+         $sql = mysqli_query($conn,"SELECT * FROM `tinybb_settings`");
+         $setting = mysqli_fetch_array($sql);
          ?>
          To disable categories, please edit your <a href="admin.php?list=settings">bulletin board settings</a>.<br /><br />
          <form action="?list=categories&do=settings&s=2" method="POST">
@@ -743,7 +743,7 @@ background-image:url('style/thread_header.png');
 				'$order'
 			)";
 
-		mysql_query($sql) or die("<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=admin.php?list=categories&m=3\">");
+		mysqli_query($conn,$sql) or die("<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=admin.php?list=categories&m=3\">");
 		              }
          ?>
          
@@ -771,8 +771,8 @@ background-image:url('style/thread_header.png');
          <?php } } elseif ($_GET['do'] == "edit"){ ?>
          <?php
          $catid = clean($_GET[cat]);
-         $sql = MYSQL_QUERY("SELECT * FROM `tinybb_categories` WHERE `cat_id` = '$catid'");
-         $checker = mysql_fetch_array($sql);
+         $sql = mysqli_query($conn,"SELECT * FROM `tinybb_categories` WHERE `cat_id` = '$catid'");
+         $checker = mysqli_fetch_array($sql);
          ?>
          <h2><img src="icons/idea.gif" border="0"> Editing <?php echo "$checker[cat_title]"; ?></h2>
          <?php if ($_GET['s'] == "2"){ ?>
@@ -782,13 +782,13 @@ background-image:url('style/thread_header.png');
                 $icon = addslashes(htmlspecialchars($_POST[icon]));
                 $perm = addslashes(htmlspecialchars($_POST[perm]));
                 $order = addslashes(htmlspecialchars($_POST[order]));
-          $update = mysql_query("UPDATE `tinybb_categories` SET `cat_title` = '$title', `cat_desc` = '$desc', `cat_icon` = '$icon', `cat_admin` = '$perm', `cat_order` = '$order' WHERE `cat_id` = '$_POST[idoc]'") or die("Could not update category, MySQL error, query could not complete.");
+          $update = mysqli_query($conn,"UPDATE `tinybb_categories` SET `cat_title` = '$title', `cat_desc` = '$desc', `cat_icon` = '$icon', `cat_admin` = '$perm', `cat_order` = '$order' WHERE `cat_id` = '$_POST[idoc]'") or die("Could not update category, MySQL error, query could not complete.");
           ?>
           <?php die("<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=admin.php?list=categories&m=4\">"); ?>
          <?php } else { ?>
          <?php
-         $check_category = mysql_query("SELECT * FROM `tinybb_categories` WHERE `cat_id` = '$catid'") or die(mysql_error());
-         if(mysql_num_rows($check_category) == 0){
+         $check_category = mysqli_query($conn,"SELECT * FROM `tinybb_categories` WHERE `cat_id` = '$catid'") or die(mysqli_error());
+         if(mysqli_num_rows($check_category) == 0){
          die("<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=admin.php?list=categories&m=11\">");
          }
          ?>
@@ -836,35 +836,35 @@ background-image:url('style/thread_header.png');
           <hr />
          <?php
          $sql = "SELECT * FROM tinybb_threads ORDER BY aid DESC LIMIT 1";
-         $res = mysql_query($sql) or die (mysql_error());
-         while($r=mysql_fetch_assoc($res)){
+         $res = mysqli_query($conn,$sql) or die (mysqli_error());
+         while($r=mysqli_fetch_assoc($res)){
          echo "<strong>Latest Thread:</strong><a href=\"index.php?page=thread&post=".$r['thread_key']."\"> <span style='font-size:14px;'>".$r['thread_title']."</span></a><br>";
          }
          ?>
          <?php
          $sql = "SELECT * FROM tinybb_replies ORDER BY aid DESC LIMIT 1";
-         $res = mysql_query($sql) or die (mysql_error());
-         while($r=mysql_fetch_assoc($res)){
+         $res = mysqli_query($conn,$sql) or die (mysqli_error());
+         while($r=mysqli_fetch_assoc($res)){
          echo "<strong>Latest Reply:</strong><a href=\"index.php?page=thread&post=".$r['thread_key']."#last\"> <span style='font-size:14px;'>Here</span></a><br>";
          }
          ?>
          <?php
          $sql = "SELECT * FROM members ORDER BY id DESC LIMIT 1";
-         $res = mysql_query($sql) or die (mysql_error());
-         while($r=mysql_fetch_assoc($res)){
+         $res = mysqli_query($conn,$sql) or die (mysqli_error());
+         while($r=mysqli_fetch_assoc($res)){
          echo "<strong>Newest Member:</strong> <a href=\"index.php?page=profile&id=".$r['username']."\"> <span style='font-size:14px;'>".$r['username']."</span></a><br>";
          }
          ?>  
          <?php
 		 $date = date("d-m-Y");
-		 $result2 = mysql_query("SELECT * FROM tinybb_threads");
-         $threads = mysql_num_rows($result2);
-		 $result3 = mysql_query("SELECT * FROM tinybb_replies");
-         $replies = mysql_num_rows($result3);
-		 $result4 = mysql_query("SELECT * FROM members");
-         $users = mysql_num_rows($result4);
-		 $result5 = mysql_query("SELECT * FROM members WHERE date='$date'");
-         $today = mysql_num_rows($result5);
+		 $result2 = mysqli_query($conn,"SELECT * FROM tinybb_threads");
+         $threads = mysqli_num_rows($result2);
+		 $result3 = mysqli_query($conn,"SELECT * FROM tinybb_replies");
+         $replies = mysqli_num_rows($result3);
+		 $result4 = mysqli_query($conn,"SELECT * FROM members");
+         $users = mysqli_num_rows($result4);
+		 $result5 = mysqli_query($conn,"SELECT * FROM members WHERE date='$date'");
+         $today = mysqli_num_rows($result5);
 		 echo "<br /><h2><img src='admin/mail.png' border='0'>  Private Message System</h2>$pm Private messages sent/received"; 
 		 echo "<br /><h2><img src='admin/threads.png' border='0'>  Threads/Replies</h2>$threads Threads created<br />$replies Replies created";
 		 echo "<br /><h2><img src='admin/users.png' border='0'>  Accounts</h2>$users Accounts Created<br />$today Accounts created today";
@@ -872,7 +872,7 @@ background-image:url('style/thread_header.png');
          <?php } elseif ($list == "awards"){ ?>
          <h3><img src="icons/user.gif" /> Awards</h3>
          <?php if ($_GET['do'] == "delete"){ ?>
-         <?php mysql_query("DELETE FROM awards WHERE id='$_GET[id]'") or die("Couldn't delete the award, MySQL error."); ?>
+         <?php mysqli_query($conn,"DELETE FROM awards WHERE id='$_GET[id]'") or die("Couldn't delete the award, MySQL error."); ?>
          Award successfully deleted! <a href="?list=awards">Back to awards list</a>.
          <?php } elseif ($_GET['do'] == "add") { ?>
          
@@ -908,7 +908,7 @@ background-image:url('style/thread_header.png');
 				'$desc'
 			)";
 
-		mysql_query($sql) or die("<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=admin.php?list=awards&m=2\">");
+		mysqli_query($conn,$sql) or die("<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=admin.php?list=awards&m=2\">");
 		?>
 		
 		<?php die("<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=admin.php?list=awards&m=1\">"); ?>
@@ -927,8 +927,8 @@ background-image:url('style/thread_header.png');
          <th>Options</th>
          <?php
          // The below is calling data from the "data"base and listing it here in an array.
-         $result = mysql_query("SELECT * FROM awards");
-    while($row = mysql_fetch_array($result)) {
+         $result = mysqli_query($conn,"SELECT * FROM awards");
+    while($row = mysqli_fetch_array($result)) {
          ?>
          <tr>
          <td align="center"><img class="avatar" src="<?php echo "$row[award_img]"; ?>" border="0"></td>
@@ -945,7 +945,7 @@ background-image:url('style/thread_header.png');
          <?php } elseif ($_GET['news'] == "delete"){ ?>
           <h3><img src="icons/news.gif" /> Deleting Article</h3>
           <hr />       
-         <?php mysql_query("DELETE FROM tinybb_news WHERE news_id='$_GET[id]'") or die(mysql_error()); ?>
+         <?php mysqli_query($conn,"DELETE FROM tinybb_news WHERE news_id='$_GET[id]'") or die(mysqli_error()); ?>
          Article deleted.
          <?php } elseif ($_GET['news'] == "edit"){ ?>
          <?php if ($_GET['do'] == "submit"){ ?>
@@ -954,14 +954,14 @@ background-image:url('style/thread_header.png');
           <?php
           $title = addslashes(htmlspecialchars($_POST[title]));
           $content = addslashes(htmlspecialchars($_POST[content]));
-          $update = mysql_query("UPDATE `tinybb_news` SET `news_content` = '$content', `news_title` = '$title' WHERE `news_id` = '$_POST[id]'");
+          $update = mysqli_query($conn,"UPDATE `tinybb_news` SET `news_content` = '$content', `news_title` = '$title' WHERE `news_id` = '$_POST[id]'");
           echo "The article has been updated.";
           ?>        
          <?php } else { ?>
          <?php
          $sql2 = "SELECT * FROM tinybb_news WHERE news_id='$_GET[id]' LIMIT 1";
-         $tt = mysql_query($sql2) or die (mysql_error());
-         while($p=mysql_fetch_assoc($tt)){ ?>
+         $tt = mysqli_query($conn,$sql2) or die (mysqli_error());
+         while($p=mysqli_fetch_assoc($tt)){ ?>
           <h3><img src="icons/news.gif" /> Editing <?php echo "$p[news_title]"; ?></h3>
           <hr />
          <form action="?news=edit&do=submit" method="POST" name="compose">
@@ -995,8 +995,8 @@ background-image:url('style/thread_header.png');
          <th>Options</th>
          <?php
          $sql2 = "SELECT * FROM tinybb_news ORDER BY news_id DESC";
-         $tt = mysql_query($sql2) or die (mysql_error());
-         while($p=mysql_fetch_assoc($tt)){ ?>
+         $tt = mysqli_query($conn,$sql2) or die (mysqli_error());
+         while($p=mysqli_fetch_assoc($tt)){ ?>
          <tr>
          <td align="center"><a href="?news=edit&id=<?php echo "$p[news_id]"; ?>"><?php echo "$p[news_title]"; ?></a></td>
          <td align="center"><?php echo "$p[news_author]"; ?></td>
@@ -1034,7 +1034,7 @@ background-image:url('style/thread_header.png');
 				'$date'
 			)";
 
-		mysql_query($sql) or die(mysql_error());
+		mysqli_query($conn,$sql) or die(mysqli_error());
 				?>
           <h3><img src="icons/news.gif" /> Add Article</h3>
           <hr />
@@ -1072,8 +1072,8 @@ background-image:url('style/thread_header.png');
           <th>Account</th>
           <?php
           // The below is calling data from the "data"base and listing it here in an array.
-          $result = mysql_query("SELECT * FROM members WHERE ip='$_POST[ip]'");
-          while($row = mysql_fetch_array($result)) { ?>
+          $result = mysqli_query($conn,"SELECT * FROM members WHERE ip='$_POST[ip]'");
+          while($row = mysqli_fetch_array($result)) { ?>
           <tr>
           <td><?php echo "$row[ip]"; ?></td>
           <td><?php echo "$row[username]"; ?></td>
@@ -1092,8 +1092,8 @@ background-image:url('style/thread_header.png');
           <hr />
           <?php if ($_GET['do'] == "add"){ ?>
           <?php
-          $check_members = mysql_query("SELECT * FROM `members` WHERE `username` = '$_POST[username]'");   
-          if(mysql_num_rows($check_members) != 0){
+          $check_members = mysqli_query($conn,"SELECT * FROM `members` WHERE `username` = '$_POST[username]'");   
+          if(mysqli_num_rows($check_members) != 0){
 			  echo "Cannot add the account. Reason: An account already exists with this username!"; 
 		  } else {
 			    $username = addslashes(htmlspecialchars($_POST[username]));
@@ -1121,7 +1121,7 @@ background-image:url('style/thread_header.png');
 				'$date'
 			)";
 
-		mysql_query($sql) or die("<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=admin.php?list=accounts&m=2\">");
+		mysqli_query($conn,$sql) or die("<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=admin.php?list=accounts&m=2\">");
 		  }                     
 		  ?>
           <?php die("<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=admin.php?list=accounts&m=1\">"); ?>
@@ -1150,12 +1150,12 @@ background-image:url('style/thread_header.png');
           <hr />
           <?php if ($_GET['do'] == "delete"){ ?>
           <?php 
-		  $id = MYSQL_QUERY("SELECT * FROM `members` WHERE `username` = '$_POST[id]'");
-          $id = mysql_fetch_array($id);
+		  $id = mysqli_query($conn,"SELECT * FROM `members` WHERE `username` = '$_POST[id]'");
+          $id = mysqli_fetch_array($id);
 		  if ($id[username] == ""){ echo "Cannot delete user because <strong><i>$_POST[id]</i></strong> does not exist."; } else { 
-		  mysql_query("DELETE FROM members WHERE username='$_POST[id]'") or die(mysql_error());
-		  mysql_query("DELETE FROM tinybb_replies WHERE reply_author='$_POST[id]'") or die(mysql_error());
-		  mysql_query("DELETE FROM tinybb_threads WHERE thread_author='$_POST[id]'") or die(mysql_error());
+		  mysqli_query($conn,"DELETE FROM members WHERE username='$_POST[id]'") or die(mysqli_error());
+		  mysqli_query($conn,"DELETE FROM tinybb_replies WHERE reply_author='$_POST[id]'") or die(mysqli_error());
+		  mysqli_query($conn,"DELETE FROM tinybb_threads WHERE thread_author='$_POST[id]'") or die(mysqli_error());
 		  ?>
           <?php die("<meta HTTP-EQUIV=\"REFRESH\" content=\"0; url=admin.php?list=accounts&m=4\">"); ?>
           <?php } } else { ?>
@@ -1173,7 +1173,7 @@ background-image:url('style/thread_header.png');
          $biography = $_POST[biography];
          $email = addslashes(htmlspecialchars($_POST[email]));
          $group = addslashes(htmlspecialchars($_POST[group]));
-         $update = mysql_query("UPDATE `members` SET `avatar` = '$avatar', `name` = '$name', `bio` = '$biography', `admin` = '$group', `email` = '$email' WHERE `username` = '$username'");
+         $update = mysqli_query($conn,"UPDATE `members` SET `avatar` = '$avatar', `name` = '$name', `bio` = '$biography', `admin` = '$group', `email` = '$email' WHERE `username` = '$username'");
          ?>
          <h3><img src="icons/user.gif" /><?php echo "$username"; ?>'s Account has been updated (<a href="index.php?page=profile&id=<?php echo "$username"; ?>">View Profile</a>)</h3>
           <hr />
@@ -1233,7 +1233,7 @@ background-image:url('style/thread_header.png');
          }elseif (isset($_GET['lock'])){ ?>
          <h3><?php $lock = $_GET['lock']; if ($lock == "1"){ ?><img src="icons/lock.gif" /> Locking a thread<br /></h3><?php } else { ?><img src="icons/unlock.gif" /> Unlocking a thread</h3><?php } ?>
          <?php
-         $update = mysql_query("UPDATE `tinybb_threads` SET `thread_lock` = '$lock' WHERE `thread_key` = '$_GET[thread]'");
+         $update = mysqli_query($conn,"UPDATE `tinybb_threads` SET `thread_lock` = '$lock' WHERE `thread_key` = '$_GET[thread]'");
          if ($lock == "1"){ echo "<span style='color:green; font-weight:bold;'>Thread Locked</a>"; } else { echo "<span style='color:green; font-weight:bold;'>Thread Unlocked</a>"; }
          ?>
          <?php
@@ -1247,7 +1247,7 @@ background-image:url('style/thread_header.png');
          <?php
 
 
-		mysql_query("DELETE FROM tinybb_replies WHERE reply_key='$_GET[thread]'") or die(mysql_error());
+		mysqli_query($conn,"DELETE FROM tinybb_replies WHERE reply_key='$_GET[thread]'") or die(mysqli_error());
 
 		echo "<span style='color:green; font-weight:bold;'>Reply deleted</a>"; ?><br /><br />
 
@@ -1266,15 +1266,15 @@ if ($con == ""){ ?>
 
 
 
-		mysql_query("DELETE FROM tinybb_threads WHERE thread_key='$_GET[thread]'") or die(mysql_error());
-		mysql_query("DELETE FROM tinybb_replies WHERE thread_key='$_GET[thread]'") or die(mysql_error());
+		mysqli_query($conn,"DELETE FROM tinybb_threads WHERE thread_key='$_GET[thread]'") or die(mysqli_error());
+		mysqli_query($conn,"DELETE FROM tinybb_replies WHERE thread_key='$_GET[thread]'") or die(mysqli_error());
 		
 		echo "<span style='color:green; font-weight:bold;'>Thread & replies deleted</a>"; ?><br /><br />
 
 <?php } } else { ?>
 <h2><img src="icons/idea.gif" border="0"> Admin Home</h2>
 <div class="admin">Latest News</div>
-<iframe frameborder="1" src="http://tinybb.net/dir/tinybb_1.4.2.html" width="100%" height="70px;">
+<iframe frameborder="0" src="admin/latestnews.html" width="100%" height="auto">
   <p>Your browser does not support iframes.</p>
 </iframe>
 <br /><br />
@@ -1282,13 +1282,13 @@ if ($con == ""){ ?>
       <?php if ($_GET['do'] == "notes"){ ?>
       <?php
 	  $notes = $_POST[notes];
-      $update = mysql_query("UPDATE `admin` SET `notes` = '$notes'");
+      $update = mysqli_query($conn,"UPDATE `admin` SET `notes` = '$notes'");
       ?>
       <meta HTTP-EQUIV="REFRESH" content="0; url=admin.php">
       <?php } else { ?>
       <?php
-	  $notes = MYSQL_QUERY("SELECT * FROM `admin`");
-      $notes = mysql_fetch_array($notes);
+	  $notes = mysqli_query($conn,"SELECT * FROM `admin`");
+      $notes = mysqli_fetch_array($notes);
 	  ?>
       <form action="admin.php?do=notes" method="POST">
       <div class="" align="center"><textarea cols="2" rows="5" name="notes" border="0"/><?php echo $notes[notes]; ?></textarea></div><br />

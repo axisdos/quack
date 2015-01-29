@@ -44,11 +44,11 @@ font-family:Arial, Helvetica, sans-serif;
 	$limit = 20;
 	
 	$query = "SELECT COUNT(*) as num FROM $tableName";
-	$total_pages = mysql_fetch_array(mysql_query($query));
+	$total_pages = mysqli_fetch_array(mysqli_query($conn,$query));
 	$total_pages = $total_pages[num];
 	
 	$stages = 3;
-	$page = mysql_escape_string($_GET['page']);
+	$page = mysqli_real_escape_string($conn,$_GET['page']);
 	if($page){
 		$start = ($page - 1) * $limit; 
 	}else{
@@ -57,7 +57,7 @@ font-family:Arial, Helvetica, sans-serif;
 	
     // Get page data
 	$query1 = "SELECT * FROM $tableName LIMIT $start, $limit ";
-	$result = mysql_query($query1);
+	$result = mysqli_query($conn,$query1);
 	
 	// Initial page num setup
 	if ($page == 0){$page = 1;}
@@ -164,7 +164,7 @@ font-family:Arial, Helvetica, sans-serif;
 <th style="background-image:url('style/thread_header.png');"><center>Join Date</center></th>
 <th style="background-image:url('style/thread_header.png');"><center>ID</center></th>
 <?php
- while($row = mysql_fetch_array($result))
+ while($row = mysqli_fetch_array($result))
 		{
                   ?>
                             

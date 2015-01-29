@@ -1,4 +1,7 @@
 <?php if ($user[username] == ""){ echo "Please login to create a thread."; } else { ?>
+<div class="container">
+<div class="row">
+<div class="col-lg-12">
 <?php
       // TINYBB 1.3 UPDATE CODE
       // Check if the category exists, if it doesn't.. DIE and provide error....
@@ -8,12 +11,12 @@
       } else {
       $catid = clean($_GET[cat]);
       }
-      $check_category = mysql_query("SELECT * FROM `tinybb_categories` WHERE `cat_id` = '$catid'") or die(mysql_error());
-      if(mysql_num_rows($check_category) == 0){
+      $check_category = mysqli_query($conn,"SELECT * FROM `tinybb_categories` WHERE `cat_id` = '$catid'") or die(mysqli_error());
+      if(mysqli_num_rows($check_category) == 0){
         die("<h2><img src='icons/idea.gif' border='0'> Boom! Error...</h2>The category you're attempting to post this thread in doesn't exist...");
       }
-      $sql = MYSQL_QUERY("SELECT * FROM `tinybb_categories` WHERE `cat_id` = '$catid'");
-      $checker = mysql_fetch_array($sql);
+      $sql = mysqli_query($conn,"SELECT * FROM `tinybb_categories` WHERE `cat_id` = '$catid'");
+      $checker = mysqli_fetch_array($sql);
       if (($checker[cat_admin] == "1") && (!$user[admin] == "1")) {  die("<h2><img src='icons/idea.gif' border='0'> \%\^\*\$\! Error...</h2>The category you're attempting to post this thread in is for staff only..."); }
       ?>
 
@@ -81,8 +84,8 @@ myField.value += myValue;
 				'$catid'
 			)";
 
-		mysql_query($sql) or die(mysql_error());
-		mysql_close($sql);
+		mysqli_query($conn,$sql) or die(mysqli_error());
+		mysqli_close($sql);
 		?>
 		<?php unset($_SESSION['check']); ?>
 		<?php } } else { echo "Spam code entered incorrectly."; } ?>
@@ -90,33 +93,31 @@ myField.value += myValue;
 		
 		<?php
 		$catid = clean($_GET['cat']);
-                $cat = MYSQL_QUERY("SELECT * FROM `tinybb_categories` WHERE `cat_id` = '$catid'");
-                $checker = mysql_fetch_array($cat);
+                $cat = mysqli_query($conn,"SELECT * FROM `tinybb_categories` WHERE `cat_id` = '$catid'");
+                $checker = mysqli_fetch_array($cat);
                 echo "<img src='icons/idea.gif' border='0'> Creating new thread in <strong>$checker[cat_title]</strong><br /><br />";
                 ?>
 		
-         <form action="?page=addthread&do=create" name="compose" method="POST">
+         <form action="?page=addthread&do=create" name="compose" method="POST" role="form">
          <input type="hidden" name="cat" value="<?php echo "$_GET[cat]"; ?>">
-         Thread Title<br />
-         <input type="text" name="title" size="50" autocomplete="off">
-         <textarea cols=70 rows=5 maxlength='1000' name='content'></textarea><br />
-         <img src="icons/smile2.png" onclick="insertit(document.compose.content, ':)');" />
-         <img src="icons/bigsmile.png" onclick="insertit(document.compose.content, ':D');" />
-         <img src="icons/frown.png" onclick="insertit(document.compose.content, ':(');" />
-         <img src="icons/wink.png" onclick="insertit(document.compose.content, ';)');" />
-         <img src="icons/blush.png" onclick="insertit(document.compose.content, ':$');" />
-         <img src="icons/skywalker.png" onclick="insertit(document.compose.content, ':sw:');" />
-         <img src="icons/yawn.png" onclick="insertit(document.compose.content, ':tired:');" />
-         <img src="icons/love.png" onclick="insertit(document.compose.content, '(L)');" />
-         <img src="icons/angry.png" onclick="insertit(document.compose.content, ':@');" />    
-         <img src="icons/underline.png" onclick="insertit(document.compose.content, '[u][/u]');" />
-         <img src="icons/italic.png" onclick="insertit(document.compose.content, '[i][/i]');" />    
-         <img src="icons/bold.png" onclick="insertit(document.compose.content, '[b][/b]');" />
-         <br /><br />
+		 <div class="form-group">
+         <label>Subject</label>
+         <input type="text" name="title" size="50" autocomplete="off" class="form-control">
+		 </div>
+		 <div class="form-group">
+		 <label>Message</label>
+         <textarea cols=70 rows=5 maxlength='1000' name='content' class="form-control"></textarea>
+		 <span class="text-muted">HTML is allowed (including YouTube embed)</span>
+		 </div>
+		 <hr />
+		 <div class="form-group">
          Spam Protection - Enter the numbers you see below<br />
-         <img src="inc/capya.php"> <br>
-         <input type="text" size="50" autocomplete="off" name="check"><br /><br>
-         <input type="submit" value="Post Thread">
+         <label><img src="inc/capya.php" /></label>
+         <input type="text" size="50" autocomplete="off" name="check" class="form-control">
+		 </div>
+		 <div class="form-group">
+         <input type="submit" value="Post Thread" class="btn btn-primary">
+		 </div>
          </form>
 
 		<?php } ?>
@@ -126,3 +127,6 @@ myField.value += myValue;
 	}
 	?>
     <br />
+	</div>
+	</div>
+	</div>

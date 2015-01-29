@@ -1,10 +1,13 @@
 <?php
+
 ###################
 // TinyBB 1.0 - www.TinyBB.net
 // Jake Steele 
 ###################
 // Configuration include files
+include_once "config.php";
 @include("inc/tinybb-settings.php"); // Most of the forum settings can be found in this file, it is located in your forum /inc/ folder 
+
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -13,6 +16,7 @@
 <meta name="description" content="TinyBB Powered Forum" />
 <meta name="keywords" content="General,Discussion,Discuss,Topics,Forum,Writing,People,Social,Network,Create,Accounts" />
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<base href="/tinybb/" />
 <link rel="stylesheet" type="text/css" href="style/style.css" />
 <link rel="stylesheet" type="text/css" href="style/pagination.css" />
 <!-- Latest compiled and minified CSS -->
@@ -20,7 +24,13 @@
 
 <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
 <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
-
+<script type="text/javascript">
+$(document).ready(function(){
+$(".avatar").error(function(){
+	$(this).hide();
+});
+});
+</script>
 <!-- Latest compiled and minified JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
 <title><?php echo "$bbsetting[tinybb_title]"; ?></title>

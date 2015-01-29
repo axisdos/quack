@@ -48,14 +48,14 @@
     <tr>
     <td align="center">
                             <?php
-                            $result = mysql_query("SELECT * FROM awards WHERE award_user = '$profile[username]'");
-                            $awards = mysql_num_rows($result);
+                            $result = mysqli_query($conn,"SELECT * FROM awards WHERE award_user = '$profile[username]'");
+                            $awards = mysqli_num_rows($result);
                             if ($awards == "0"){ echo "$profile[username] has no awards."; } else { 
                             ?>
                             <?php
                             $sql = "SELECT * FROM awards WHERE award_user = '$profile[username]' ORDER BY id DESC LIMIT 50";
-                            $res = mysql_query($sql) or die (mysql_error());
-                            while($r=mysql_fetch_assoc($res)){
+                            $res = mysqli_query($conn,$sql) or die (mysqli_error());
+                            while($r=mysqli_fetch_assoc($res)){
                             echo "<img src='$r[award_img]' border='0' alt='$r[award_desc]' title='$r[award_desc]'>";  
                             }
                             ?>
@@ -76,10 +76,10 @@
     <strong>Joined</strong>: <?php echo "$profile[date]"; ?>
     <br /><br />
     <?php
-         $res = mysql_query("SELECT * FROM tinybb_replies WHERE reply_author = '$profile[username]'");
-         $res2 = mysql_query("SELECT * FROM tinybb_threads WHERE thread_author = '$profile[username]'");
-         $posts = mysql_num_rows($res);
-         $topics = mysql_num_rows($res2);
+         $res = mysqli_query($conn,"SELECT * FROM tinybb_replies WHERE reply_author = '$profile[username]'");
+         $res2 = mysqli_query($conn,"SELECT * FROM tinybb_threads WHERE thread_author = '$profile[username]'");
+         $posts = mysqli_num_rows($res);
+         $topics = mysqli_num_rows($res2);
          echo "<strong>Topics:</strong> $topics<br /><strong>Replies:</strong> $posts";
     ?>
     <br /><br />

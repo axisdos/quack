@@ -1,5 +1,7 @@
 <?php
 
+
+
 // include smarty templating
 
 require_once "lib/3rdparty/smarty/Smarty.class.php";
@@ -24,19 +26,19 @@ function purify($message){
 
 if(isset($_GET['post'])){
     // will implement PDO or something similar later on
-    $identifier = mysql_real_escape_string($_GET['post']);
-    $findthread = mysql_query("SELECT * FROM tinybb_threads INNER JOIN members ON tinybb_threads.thread_author = members.username WHERE tinybb_threads.thread_key = '{$identifier}'");
+    $identifier = mysqli_real_escape_string($conn,$_GET['post']);
+    $findthread = mysqli_query($conn,"SELECT * FROM tinybb_threads INNER JOIN members ON tinybb_threads.thread_author = members.username WHERE tinybb_threads.thread_key = '{$identifier}'");
     
-    if(mysql_num_rows($findthread) == 0){
+    if(mysqli_num_rows($findthread) == 0){
         $view->assign('url', 'showthread');
         $view->display('lib/tpl/404.tpl');
     } else {
-        $firstpost = mysql_fetch_assoc($findthread);
+        $firstpost = mysqli_fetch_assoc($findthread);
         
         // allow users to post
         
         if(isset($user) && isset($_POST['addpost'])){
-            $message = mysql_real_escape_string($_POST['message']);
+            $message = mysqli_real_escape_string($conn,$_POST['message']);
             
             if(strlen($message) < 5 || strlen($message) > 10000){
                 $view->assign('error', 'Your message length didn\'t meet our guidelines');
@@ -44,7 +46,7 @@ if(isset($_GET['post'])){
                 $username = $user['username'];
                 $replykey = uniqid();
                 $date = date("d-m-Y H:i:s");
-                mysql_query("INSERT INTO tinybb_replies (reply_content, reply_author, reply_key, thread_key, date) VALUES('$message', '$username', '$replykey', '$identifier', '$date')");
+                mysqli_query($conn,"INSERT INTO tinybb_replies (reply_content, reply_author, reply_key, thread_key, date) VALUES('$message', '$username', '$replykey', '$identifier', '$date')");
                 
                 $view->assign('success', 'Your post was successfully added');
             }
@@ -53,15 +55,15 @@ if(isset($_GET['post'])){
         
         $view->assign('firstpost', $firstpost);
         
-        $findposts = mysql_query("SELECT *, tinybb_replies.date as postdate FROM tinybb_replies INNER JOIN members ON tinybb_replies.reply_author = members.username WHERE tinybb_replies.thread_key = '{$identifier}'");
+        $findposts = mysqli_query($conn,"SELECT *, tinybb_replies.date as postdate FROM tinybb_replies INNER JOIN members ON tinybb_replies.reply_author = members.username WHERE tinybb_replies.thread_key = '{$identifier}'");
         
-        if(mysql_num_rows($findposts) == 0){
+        if(mysqli_num_rows($findposts) == 0){
             $view->assign('noreplies', 1);
             // tell the template to tell the browser there's no replies
         } else {
             $posts = array();
             
-            while($post = mysql_fetch_array($findposts)){
+            while($post = mysqli_fetch_array($findposts)){
                 $posts[] = $post;
             }
             
@@ -81,8 +83,8 @@ die();
 		 $purifier = new HTMLPurifier();
       if (!$_GET['post']){ } else {
         $clean_get = clean($_GET[post]);
-      $check_thread = mysql_query("SELECT * FROM `tinybb_threads` WHERE `thread_key` = '$clean_get'") or die(mysql_error());
-      if(mysql_num_rows($check_thread) == 0){
+      $check_thread = mysqli_query($conn,"SELECT * FROM `tinybb_threads` WHERE `thread_key` = '$clean_get'") or die(mysqli_error());
+      if(mysqli_num_rows($check_thread) == 0){
         die("<h2><img src='icons/idea.gif' border='0'> Boom! Error...</h2>The thread doesn't exist...");
       } }
 ?>
@@ -157,8 +159,8 @@ myField.value += myValue;
 		<div class="posts">
          <?php
          // The below is calling data from the "data"base and listing it here in an array.
-         $result = mysql_query("SELECT * FROM tinybb_threads WHERE thread_key ='".addslashes(htmlspecialchars($_GET['post']))."' LIMIT 1") or die("<h3><img src='icons/idea.gif'> Oops, an error?</h3>It seems an error has occured with the forum, contact the administrator to report this issue. (For documentation, MYSQL)<br /><br /><br /><br /><br /></h3>");
-         while($row = mysql_fetch_array($result))  {
+         $result = mysqli_query($conn,"SELECT * FROM tinybb_threads WHERE thread_key ='".addslashes(htmlspecialchars($_GET['post']))."' LIMIT 1") or die("<h3><img src='icons/idea.gif'> Oops, an error?</h3>It seems an error has occured with the forum, contact the administrator to report this issue. (For documentation, MYSQL)<br /><br /><br /><br /><br /></h3>");
+         while($row = mysqli_fetch_array($result))  {
          ?>
 		 <div class="page-header" style="margin-top:0;">
 		 <h2 class="pull-left">
@@ -182,8 +184,8 @@ myField.value += myValue;
 		 <div class="postbit">
 		 <div>
 			           <?php
-           $av = MYSQL_QUERY("SELECT * FROM `members` WHERE `username` = '$row[thread_author]'");
-           $av = mysql_fetch_array($av);
+           $av = mysqli_query($conn,"SELECT * FROM `members` WHERE `username` = '$row[thread_author]'");
+           $av = mysqli_fetch_array($av);
 		   if ($av[avatar] == null){ echo "<img src='https://en.gravatar.com/images/gravatars/no_gravatar.gif' class='avatar ' />"; } else { 
            echo "<img src='$av[avatar]' class='avatar' />";
            }
@@ -195,10 +197,10 @@ myField.value += myValue;
 		 
         
          <?php
-         $res = mysql_query("SELECT * FROM tinybb_replies WHERE reply_author = '$row[thread_author]'");
-         $res2 = mysql_query("SELECT * FROM tinybb_threads WHERE thread_author = '$row[thread_author]'");
-         $posts = mysql_num_rows($res);
-         $topics = mysql_num_rows($res2);
+         $res = mysqli_query($conn,"SELECT * FROM tinybb_replies WHERE reply_author = '$row[thread_author]'");
+         $res2 = mysqli_query($conn,"SELECT * FROM tinybb_threads WHERE thread_author = '$row[thread_author]'");
+         $posts = mysqli_num_rows($res);
+         $topics = mysqli_num_rows($res2);
 		 $total = ($posts * $topics);
          echo "<br /> $total messages";
          ?>
@@ -264,8 +266,8 @@ myField.value += myValue;
 		 <hr />
          <?php
          // The below is calling data from the "data"base - FOR REPLIES
-         $result = mysql_query("SELECT * FROM tinybb_replies WHERE thread_key ='".addslashes(htmlspecialchars($_GET['post']))."' ORDER BY ABS(`aid`) ASC LIMIT 5000") or die("<h3><img src='icons/idea.gif'> Oops, an error?</h3>It seems an error has occured with the forum, contact the administrator to report this issue. (For documentation, MYSQL)<br /><br /><br /><br /><br /></h3>");
-         while($row = mysql_fetch_array($result))  {
+         $result = mysqli_query($conn,"SELECT * FROM tinybb_replies WHERE thread_key ='".addslashes(htmlspecialchars($_GET['post']))."' ORDER BY ABS(`aid`) ASC LIMIT 5000") or die("<h3><img src='icons/idea.gif'> Oops, an error?</h3>It seems an error has occured with the forum, contact the administrator to report this issue. (For documentation, MYSQL)<br /><br /><br /><br /><br /></h3>");
+         while($row = mysqli_fetch_array($result))  {
          ?>
 
          <div class="row">
@@ -273,8 +275,8 @@ myField.value += myValue;
 		 <div class="postbit">
 		 <div>
 			           <?php
-           $av = MYSQL_QUERY("SELECT * FROM `members` WHERE `username` = '$row[reply_author]'");
-           $av = mysql_fetch_array($av);
+           $av = mysqli_query($conn,"SELECT * FROM `members` WHERE `username` = '$row[reply_author]'");
+           $av = mysqli_fetch_array($av);
 		   if ($av[avatar] == null){ echo "<img src='https://en.gravatar.com/images/gravatars/no_gravatar.gif' class='avatar'>"; } else { 
            echo "<img src='$av[avatar]' class='avatar'>";
            }
@@ -285,10 +287,10 @@ myField.value += myValue;
          </a>
          <br />
          <?php
-         $res = mysql_query("SELECT * FROM tinybb_replies WHERE reply_author = '$row[reply_author]'");
-         $res2 = mysql_query("SELECT * FROM tinybb_threads WHERE thread_author = '$row[reply_author]'");
-         $posts = mysql_num_rows($res);
-         $topics = mysql_num_rows($res2);
+         $res = mysqli_query($conn,"SELECT * FROM tinybb_replies WHERE reply_author = '$row[reply_author]'");
+         $res2 = mysqli_query($conn,"SELECT * FROM tinybb_threads WHERE thread_author = '$row[reply_author]'");
+         $posts = mysqli_num_rows($res);
+         $topics = mysqli_num_rows($res2);
 		 $total = ($posts * $topics);
          echo "$total messages";
          ?>
@@ -327,8 +329,8 @@ myField.value += myValue;
 		 </div>
          <?php
          // The below is calling data from the "data"base and listing it here in an array.
-         $result = mysql_query("SELECT * FROM tinybb_threads WHERE thread_key ='".addslashes(htmlspecialchars($_GET['post']))."' LIMIT 1") or die("<h3><img src='icons/idea.gif'> Oops, an error?</h3>It seems an error has occured with the forum, contact the administrator to report this issue. (For documentation, MYSQL)<br /><br /><br /><br /><br /></h3>");
-         while($row = mysql_fetch_array($result))  {
+         $result = mysqli_query($conn,"SELECT * FROM tinybb_threads WHERE thread_key ='".addslashes(htmlspecialchars($_GET['post']))."' LIMIT 1") or die("<h3><img src='icons/idea.gif'> Oops, an error?</h3>It seems an error has occured with the forum, contact the administrator to report this issue. (For documentation, MYSQL)<br /><br /><br /><br /><br /></h3>");
+         while($row = mysqli_fetch_array($result))  {
            // Version 1.3.2 Edit
          if ($row[thread_lock] == "1"){ die("<br /><strong>Cannot post reply, the thread is locked.</strong>"); }
          }
@@ -341,7 +343,7 @@ myField.value += myValue;
                 <?php
                 // THE THREAD ID RANDOMIZER 
                 srand ((double) microtime( )*1000000); $random_number = rand(0,9999999999999);
-                $content = mysql_real_escape_string($_POST['content']);
+                $content = mysqli_real_escape_string($conn,$_POST['content']);
                 $author = "$user[username]";
                 $avatar = addslashes(htmlspecialchars($_POST[avatar]));
                 $thread = addslashes(htmlspecialchars($_POST[post]));
@@ -369,8 +371,8 @@ myField.value += myValue;
 			)";
 
 
-		mysql_query($sql) or die(mysql_error());
-		mysql_close($sql);
+		mysqli_query($conn,$sql) or die(mysqli_error());
+		mysqli_close($sql);
                 } else {
                   echo "You must be logged in to perform this action."; 
                 }  
@@ -380,8 +382,8 @@ myField.value += myValue;
          <?php } else { ?>
          <?php
          // The below is calling data from the "data"base and listing it here in an array.
-         $result = mysql_query("SELECT * FROM tinybb_threads WHERE thread_key ='".addslashes(htmlspecialchars($_GET['post']))."' LIMIT 1") or die("<h3><img src='icons/idea.gif'> Oops, an error?</h3>It seems an error has occured with the forum, contact the administrator to report this issue. (For documentation, MYSQL)<br /><br /><br /><br /><br /></h3>");
-         while($row = mysql_fetch_array($result))  {
+         $result = mysqli_query($conn,"SELECT * FROM tinybb_threads WHERE thread_key ='".addslashes(htmlspecialchars($_GET['post']))."' LIMIT 1") or die("<h3><img src='icons/idea.gif'> Oops, an error?</h3>It seems an error has occured with the forum, contact the administrator to report this issue. (For documentation, MYSQL)<br /><br /><br /><br /><br /></h3>");
+         while($row = mysqli_fetch_array($result))  {
          ?>
          <?php if ($user[username] == null){ } else { ?>
          <?php if ($row[thread_lock] == "1"){ echo "<br /><div class='warning'>The thread is locked.</div>"; } else { ?>

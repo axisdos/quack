@@ -3,8 +3,10 @@
 // TinyBB 1.0 - www.TinyBB.net
 // Jake Steele 
 ###################
-ini_set('display_errors', 0);
-ob_start();session_start();
+
+
+error_reporting(E_ERROR | E_WARNING | E_PARSE);
+
 define("IN_FORUM", 1);
 @include("inc/version_checker.php");
 require_once "lib/3rdparty/smarty/Smarty.class.php";
@@ -19,8 +21,8 @@ $hostname = "localhost";
 $data_username = "root"; //database username
 $data_password = "lol123"; //database password
 $data_basename = "tinybb"; //database name
-$conn = mysql_connect("".$hostname."","".$data_username."","".$data_password."");  
-mysql_select_db("".$data_basename."") or die("<center><span style='font-family:tahoma; font-size:12px;'><img src='images/logo.png'><br />Error - Could not connect to a database</span></center>");
+$conn = mysqli_connect($hostname, $data_username, $data_password, $data_basename);
+
 
 
 

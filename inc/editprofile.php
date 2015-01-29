@@ -6,7 +6,7 @@
  $avatar = addslashes(htmlspecialchars($_POST[avatar]));
  $name = addslashes(htmlspecialchars($_POST[name]));
  $biography = addslashes(htmlspecialchars($_POST[biography]));
- $update = mysql_query("UPDATE `members` SET `avatar` = '$avatar', `name` = '$name', `bio` = '$biography' WHERE `username` = '$user[username]'");
+ $update = mysqli_query($conn,"UPDATE `members` SET `avatar` = '$avatar', `name` = '$name', `bio` = '$biography' WHERE `username` = '$user[username]'");
  echo "Your profile has been saved.";
  ?>
   <?php } elseif($_GET['do'] == "password"){ ?>
@@ -14,7 +14,7 @@
  <?php
  $password = trim(sha1(md5(md5(sha1(md5(sha1(sha1(md5($_POST[password])))))))));
  if ($_POST[password] == null){ echo "Your password cannot be blank..."; } else {
- $update = mysql_query("UPDATE `members` SET `password` = '$password' WHERE `username` = '$user[username]'");
+ $update = mysqli_query($conn,"UPDATE `members` SET `password` = '$password' WHERE `username` = '$user[username]'");
  echo "Your password has been updated.";
  }
  ?>

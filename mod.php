@@ -11,8 +11,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <?php
-$notes = MYSQL_QUERY("SELECT * FROM `admin`");
-$notes = mysql_fetch_array($notes);
+$notes = mysqli_query($conn,"SELECT * FROM `admin`");
+$notes = mysqli_fetch_array($notes);
 ?>
 <?php
          $codes = array(
@@ -401,7 +401,7 @@ background-image:url('style/thread_header.png');
          <?php
          if ((($profile[admin] == 1) || ($profile[id] == null) || (!$profile[admin] == 3))) { echo "<h2></h2>Error with request."; } else {
          $account = clean($_GET[id]);
-         $update = mysql_query("UPDATE `members` SET `admin` = '0' WHERE `username` = '$account'") or die ("Error while attempting to modify database information");
+         $update = mysqli_query($conn,"UPDATE `members` SET `admin` = '0' WHERE `username` = '$account'") or die ("Error while attempting to modify database information");
          echo "<h2></h2>Successfully unbanned $_GET[id]";
          }
          ?>
@@ -409,11 +409,11 @@ background-image:url('style/thread_header.png');
          
          <?php
          $modp = clean($_POST[account]);
-         $sql = MYSQL_QUERY("SELECT * FROM `members` WHERE `username` = '$modp'");
-         $modp2 = mysql_fetch_array($sql);
+         $sql = mysqli_query($conn,"SELECT * FROM `members` WHERE `username` = '$modp'");
+         $modp2 = mysqli_fetch_array($sql);
          if ((($modp2[admin] == 1) || ($modp2[id] == null) || ($modp2[admin] == 3))) { echo "<h2></h2>Error with request."; } else {
          $account = clean($_GET[id]);
-         $update = mysql_query("UPDATE `members` SET `admin` = '3' WHERE `username` = '$modp'") or die ("Error while attempting to modify database information");
+         $update = mysqli_query($conn,"UPDATE `members` SET `admin` = '3' WHERE `username` = '$modp'") or die ("Error while attempting to modify database information");
          echo "<h2></h2>Successfully banned $_GET[id]";
          }
          ?>
@@ -431,8 +431,8 @@ background-image:url('style/thread_header.png');
           <th>Actions</th>
           <?php
           // The below is calling data from the "data"base and listing it here in an array.
-          $result = mysql_query("SELECT * FROM members WHERE admin='3'");
-          while($row = mysql_fetch_array($result)) { ?>
+          $result = mysqli_query($conn,"SELECT * FROM members WHERE admin='3'");
+          while($row = mysqli_fetch_array($result)) { ?>
           <tr>
           <td align="center"><?php echo "$row[username]"; ?></td>
           <td align="center"><a href="?do=unban&id=<?php echo "$row[username]"; ?>"><img src="icons/modu.gif" title="Unban Account" alt="Unban Account" border="0"></a></td>
